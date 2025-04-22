@@ -2,6 +2,12 @@
 A simple REST API reverse proxy for MTA's complicated GTFS and GTFS-RT APIs. Built
 with FastAPI and `gtfs-realtime-bindings`
 
+# Important dependencies
+- [FastAPI](https://github.com/fastapi/fastapi)
+- [gtfs-realtime-bindings](https://github.com/MobilityData/gtfs-realtime-bindings)
+
+*Note: check `requirements.txt` for list of dependencies*
+
 # Setting up locally
 First, create then activate virtual environment:
 
