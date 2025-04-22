@@ -18,7 +18,7 @@ pip install -r requirements.txt
 Finally, simply run the server by running:
 
 ```sh
-python -m app.main
+fastapi dev app/main.py
 ```
 *Note: the server runs on port: 8000 so ensure that the port is available.
 Otherwise, change the port number.*
