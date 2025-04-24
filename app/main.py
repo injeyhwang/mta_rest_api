@@ -1,17 +1,14 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import logging # TODO: Implement Logging
 
 from app.api.router import api_router
-from app.dependencies import get_settings
+from app.config import settings
 
 
 def create_server() -> FastAPI:
     """
     Create and configure the FastAPI web server.
     """
-    settings = get_settings()
-
     app = FastAPI(
         title=settings.app_name,
         description=settings.app_description,

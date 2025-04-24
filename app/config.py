@@ -21,3 +21,6 @@ class Settings(BaseSettings):
 
     # Debug mode
     debug: bool = True
+
+
+settings = Settings()

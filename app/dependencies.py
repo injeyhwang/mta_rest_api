@@ -14,15 +14,3 @@ def get_mta_rt_service() -> MTAServiceRT:
     is returned for subsequent calls.
     """
     return MTAServiceRT()
-
-
-@lru_cache()
-def get_settings() -> Settings:
-    """
-    Singleton factory for pydantic Settings instance.
-
-    The @lru_cache() decorator ensures this function is only executed once, and the same instance
-    is returned for subsequent calls.
-    """
-
-    return Settings()
