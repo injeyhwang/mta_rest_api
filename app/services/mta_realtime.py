@@ -1,26 +1,20 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from google.protobuf.json_format import MessageToDict
 from google.transit import gtfs_realtime_pb2
 import json
+import logging
 from pathlib import Path
 import requests
 from typing import Dict, Optional
 
 
-class MTAFeed:
-    """
-    Available real time MTA Feeds
-    """
-
-    LIRR = "LIRR"
-    MNR = "MNR"
-    SUBWAY_LINES = ["ACE", "BDFM", "G", "JZ", "NQRW", "L", "S1234567", "SIR"]
+logger = logging.getLogger(__name__)
 
 
 class MTAServiceRT:
     """
     MTA service object that loads GTFS-RT feed endpoints from mta_feed_urls.json and provides the
-    method: 'get_mta_feed(feed: MTAFeed)' to interact with MTA's GTFS-RT API.
+    method: 'mta_service_realtime(feed: MTAFeed)' to interact with MTA's GTFS-RT API.
 
     Check https://api.mta.info/#/ for real time data feeds developer resources.
     """
@@ -35,26 +29,44 @@ class MTAServiceRT:
 
         Raises:
             HTTPException: 500 Internal Server Error. Feed endpoint configuration is missing in JSON.
-
             HTTPException: 502 Bad Gateway. There is an issue interacting with MTA's GTFS-RT API.
+            HTTPException: 504 Gateway Timeout. GTFS-RT request timed out.
 
         Returns:
             Dict[str: Any]: Dictionary converted GTFS-RT message.
         """
         mta_endpoint: str = self._get_endpoint_url(feed=feed)
         if not mta_endpoint:
-            # this shouldn't happen
-            raise HTTPException(status_code=500, detail=f"No endpoint configuration found for feed: {feed}")
+            logger.error(f"No endpoint configuration found for feed: {feed}")
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                                detail=f"No endpoint configuration found for feed: {feed}")
 
+        logger.info(f"Fetching GTFS-RT feed from endpoint: {mta_endpoint}")
         feed = gtfs_realtime_pb2.FeedMessage()
 
-        res = requests.get(mta_endpoint)
-        if res.status_code != 200:
-            raise HTTPException(status_code=502, detail="Error fetching GTFS-RT feed.")
+        try:
+            res = requests.get(mta_endpoint, timeout=10)
+            if res.status_code != status.HTTP_200_OK:
+                logger.error(f"Error fetching GTFS-RT feed. Status code: {res.status_code}")
+                raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY,
+                                    detail="Error fetching GTFS-RT feed.")
 
-        feed.ParseFromString(res.content)
-        feed_dict = MessageToDict(feed, preserving_proto_field_name=True)
-        return feed_dict
+            logger.info("Parsing GTFS-RT feed")
+            feed.ParseFromString(res.content)
+            logger.info("Converting protobuf message to dictionary")
+            feed_dict = MessageToDict(feed, preserving_proto_field_name=True)
+            logger.info("Successfully processed GTFS-RT feed")
+            return feed_dict
+
+        except requests.exceptions.Timeout:
+            logger.error("Timeout while fetching GTFS-RT feed")
+            raise HTTPException(status_code=status.HTTP_504_GATEWAY_TIMEOUT,
+                                detail="Timeout while fetching GTFS-RT feed")
+
+        except Exception as e:
+            logger.exception(f"Error processing GTFS-RT feed: {e}")
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                                detail="Error processing GTFS-RT feed")
 
     def _load_endpoint_urls(self) -> Dict[str, str]:
         """
