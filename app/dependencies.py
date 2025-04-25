@@ -1,7 +1,6 @@
 from functools import lru_cache
 
 from app.services.mta_realtime import MTAServiceRT
-from app.config import Settings
 
 
 @lru_cache()
