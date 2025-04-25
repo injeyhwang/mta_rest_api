@@ -53,7 +53,8 @@ class StopTime(SQLModel, table=True):
 class Transfer(SQLModel, table=True):
     from_stop_id: str = Field(primary_key=True, foreign_key="stop.stop_id",
                               description="Stop ID where transfer begins")
-    to_stop_id: str = Field(primary_key=True, foreign_key="stop.stop_id",
+    to_stop_id: str = Field(primary_key=True,
+                            foreign_key="stop.stop_id",
                             description="Stop ID where transfer ends")
     transfer_type: int = Field(description="Type of transfer (0=recommended, 1=timed, 2=min_time, 3=not_possible)")
     min_transfer_time: int | None = Field(default=None,
@@ -63,10 +64,11 @@ class Transfer(SQLModel, table=True):
 class Trip(SQLModel, table=True):
     trip_id: str = Field(primary_key=True, description="Unique identifier for the trip")
     route_id: str = Field(foreign_key="route.route_id",
-                          description="Unique identifier of the route the trip takes")
+                          description="Route ID the trip takes")
     service_id: str = Field(foreign_key="calendar.service_id",
                             description="Service ID referencing the calendar")
-    trip_headsign: str = Field(description="Text that appears on signage")
-    direction_id: bool = Field(description="Direction of travel: True for inbound (1), False for outbound (0)")
-    shape_id: str | None = Field(default=None, foreign_key="shape.shape_id",
+    trip_headsign: str = Field(description="Text that appears on head signage")
+    direction_id: int = Field(description="Direction of travel (1=inbound, 0=outbound)")
+    shape_id: str | None = Field(default=None,
+                                 foreign_key="shape.shape_id",
                                  description="ID of the shape used for this trip")
