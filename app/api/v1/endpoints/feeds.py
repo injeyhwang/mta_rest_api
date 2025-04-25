@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Path, status
 import logging
-from app.dependencies import mta_service_realtime
+from app.dependencies import get_mta_rt_service
 from app.models.realtime_models import Feed, FeedResponse
 from app.services.mta_realtime import MTAServiceRT
 
@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
                   responses={502: {"description": "Error fetching GTFS-RT feed"},
                              504: {"description": "Timeout fetching GTFS-RT feed"}})
 async def get_ace_feed(feed: Feed = Path(description=""),
-                       service: MTAServiceRT = Depends(mta_service_realtime)) -> str:
+                       service: MTAServiceRT = Depends(get_mta_rt_service)) -> str:
     try:
         feed_data = service.get_mta_feed(feed.value)
         return FeedResponse(**feed_data)

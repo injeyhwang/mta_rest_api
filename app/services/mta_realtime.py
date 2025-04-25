@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 class MTAServiceRT:
     """
     MTA service object that loads GTFS-RT feed endpoints from mta_feed_urls.json and provides the
-    method: 'mta_service_realtime(feed: MTAFeed)' to interact with MTA's GTFS-RT API.
+    method: 'get_mta_rt_service(feed: MTAFeed)' to interact with MTA's GTFS-RT API.
 
     Check https://api.mta.info/#/ for real time data feeds developer resources.
     """
