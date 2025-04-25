@@ -5,17 +5,17 @@ from app.models.realtime_models import Feed, FeedResponse
 from app.services.mta_realtime import MTAServiceRT
 
 
-feeds_router = APIRouter()
+router = APIRouter()
 logger = logging.getLogger(__name__)
 
 
-@feeds_router.get("/{feed}",
-                  response_model=FeedResponse,
-                  status_code=status.HTTP_200_OK,
-                  summary="Get real-time subway line feed",
-                  description="Retrieve real-time data for a given subway feed",
-                  responses={502: {"description": "Error fetching GTFS-RT feed"},
-                             504: {"description": "Timeout fetching GTFS-RT feed"}})
+@router.get("/{feed}",
+            response_model=FeedResponse,
+            status_code=status.HTTP_200_OK,
+            summary="Get real-time subway line feed",
+            description="Retrieve real-time data for a given subway feed",
+            responses={502: {"description": "Error fetching GTFS-RT feed"},
+                       504: {"description": "Timeout fetching GTFS-RT feed"}})
 async def get_ace_feed(feed: Feed = Path(description=""),
                        service: MTAServiceRT = Depends(get_mta_rt_service)) -> str:
     try:
