@@ -4,7 +4,7 @@ from google.transit import gtfs_realtime_pb2
 import json
 from pathlib import Path
 import requests
-from typing import Dict, Optional
+from typing import Dict
 
 from app.utils.logger import logger
 
@@ -79,7 +79,7 @@ class MTAServiceRT:
         with open(json_file_path, "r", encoding="utf-8") as f:
             return json.load(f)
 
-    def _get_endpoint_url(self, feed: str) -> Optional[str]:
+    def _get_endpoint_url(self, feed: str) -> str | None:
         """
         Get the endpoint URL for a specific MTA GTFS-RT feed.
 
@@ -89,6 +89,6 @@ class MTAServiceRT:
             feed (str): The feed to get the URL for.
 
         Returns:
-            Optional[str]: The endpoint URL, or None if not found.
+            str | None: The endpoint URL, or None if not found.
         """
         return self.mta_endpoints.get(feed)
