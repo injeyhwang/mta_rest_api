@@ -1,26 +1,15 @@
 import csv
 from datetime import datetime
 import os
-from sqlmodel import create_engine, select, Session, SQLModel
+from sqlmodel import select, Session, SQLModel
 from typing import Any, Dict, List
 
-from app.models.static_models import Calendar, Route, Stop, Shape, StopTime, Transfer, Trip
+from app.db.models import Calendar, Route, Stop, Shape, StopTime, Transfer, Trip
 from app.utils.logger import logger
+from scripts.init_db import init_database
 
 
-DATABASE_URL = os.environ.get("DATABASE_URL")
 GTFS_DIR_PATH = os.environ.get("GTFS_DIR_PATH")
-
-
-def setup_db_engine():
-    logger.info(f"Connecting to database: {DATABASE_URL}")
-    engine = create_engine(DATABASE_URL)
-    return engine
-
-
-def create_db_tables(engine):
-    logger.info("Creating database tables if they don't exist")
-    SQLModel.metadata.create_all(engine)
 
 
 def read_csv_file(file_path: str) -> List[Dict[str, Any]]:
@@ -275,8 +264,8 @@ def main():
         logger.error(f"GTFS directory not found at: '{GTFS_DIR_PATH}'")
         return
 
-    engine = setup_db_engine()
-    create_db_tables(engine)
+    # Initialize database and tables if they don't exist; get engine to perform database seeding
+    engine = init_database()
 
     with Session(engine) as session:
         # Seed tables in order of dependencies
