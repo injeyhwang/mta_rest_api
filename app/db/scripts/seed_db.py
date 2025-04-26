@@ -6,7 +6,7 @@ from typing import Any, Dict, List
 
 from app.db.models import Calendar, Route, Stop, Shape, StopTime, Transfer, Trip
 from app.utils.logger import logger
-from scripts.init_db import init_database
+from scripts.init_db import get_db_engine, create_db_tables
 
 
 GTFS_DIR_PATH = os.environ.get("GTFS_DIR_PATH")
@@ -256,7 +256,10 @@ def seed_transfers(session: Session):
         raise
 
 
-def main():
+def seed_database():
+    """
+    Seed the database with GTFS static data.
+    """
     start_time = datetime.now()
     logger.info(f"Starting GTFS data seeding at {start_time}")
 
@@ -264,23 +267,30 @@ def main():
         logger.error(f"GTFS directory not found at: '{GTFS_DIR_PATH}'")
         return
 
-    # Initialize database and tables if they don't exist; get engine to perform database seeding
-    engine = init_database()
+    try:
+        # Initialize database and tables if they don't exist; get engine to perform database seeding
+        engine = get_db_engine()
+        create_db_tables(engine)
 
-    with Session(engine) as session:
-        # Seed tables in order of dependencies
-        seed_routes(session)
-        seed_stops(session)
-        seed_calendar(session)
-        seed_shapes(session)
-        seed_trips(session)
-        seed_stop_times(session)
-        seed_transfers(session)
+        with Session(engine) as session:
+            # Seed tables in order of dependencies
+            seed_routes(session)
+            seed_stops(session)
+            seed_calendar(session)
+            seed_shapes(session)
+            seed_trips(session)
+            seed_stop_times(session)
+            seed_transfers(session)
 
-        end_time = datetime.now()
-        duration = end_time - start_time
-        logger.info(f"Database seeding completed successfully in {duration}")
+            end_time = datetime.now()
+            duration = end_time - start_time
+            logger.info(f"Database seeding completed successfully in {duration}")
+    finally:
+        if engine:
+            logger.info("Disposing database engine")
+            engine.dispose()
+            logger.info("Database connections closed")
 
 
 if __name__ == "__main__":
-    main()
+    seed_database()

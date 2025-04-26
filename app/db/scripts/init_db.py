@@ -9,7 +9,8 @@ def get_db_engine():
     Create and return a database engine based on the DATABASE_URL environment variable.
     """
     DATABASE_URL = os.environ.get("DATABASE_URL")
-    logger.info(f"Connecting to database: '{DATABASE_URL}'")
+    database_name = DATABASE_URL.split("/")[-1]
+    logger.info(f"Connecting to database: '{database_name}'")
     engine = create_engine(DATABASE_URL)
     return engine
 
@@ -26,11 +27,18 @@ def init_database():
     """
     Initialize the database by creating the engine and all tables.
     """
-    engine = get_db_engine()
-    create_db_tables(engine)
-    logger.info("Database initialization completed")
-    return engine
-
+    try:
+        engine = get_db_engine()
+        create_db_tables(engine)
+        logger.info("Database initialization completed")
+    except Exception as e:
+        logger.exception(f"Database initialization failed: {e}")
+        raise
+    finally:
+        if engine:
+            logger.info("Disposing database engine")
+            engine.dispose()
+            logger.info("Database connections closed")
 
 if __name__ == "__main__":
     init_database()
