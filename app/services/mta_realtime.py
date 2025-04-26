@@ -2,13 +2,11 @@ from fastapi import HTTPException, status
 from google.protobuf.json_format import MessageToDict
 from google.transit import gtfs_realtime_pb2
 import json
-import logging
 from pathlib import Path
 import requests
 from typing import Dict, Optional
 
-
-logger = logging.getLogger(__name__)
+from app.logger import logger
 
 
 class MTAServiceRT:

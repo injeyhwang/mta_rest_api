@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, Path, status
-import logging
 from app.dependencies import get_mta_rt_service
 from app.models.realtime_models import Feed, FeedResponse
 from app.services.mta_realtime import MTAServiceRT
 
+from app.logger import logger
+
 
 router = APIRouter()
-logger = logging.getLogger(__name__)
 
 
 @router.get("/{feed}",
