@@ -6,7 +6,7 @@ from typing import Any, Dict, List
 
 from app.db.models import Calendar, Route, Stop, Shape, StopTime, Transfer, Trip
 from app.utils.logger import logger
-from scripts.init_db import get_db_engine, create_db_tables
+from app.db.scripts.init_db import get_db_engine, create_db_tables
 
 
 GTFS_DIR_PATH = os.environ.get("GTFS_DIR_PATH")
