@@ -12,27 +12,45 @@ with FastAPI and `gtfs-realtime-bindings`
 # Setting up locally
 The setup guide will be broken into the following steps:
 
-1. Git clone this repository
-2. Download and unzip the latest `gtfs_subway` into the root of this project
-3. Set up PostgreSQL database and `mta_admin` user
-4. Set up Python and virtual environment
-5. Seed the database with the latest `gtfa_subway` data
-6. Run `main.py`
+1. Set up Python and virtual environment
+2. Set up PostgreSQL database and `mta_admin` user
+3. [Optional] Download and unzip the latest `gtfs_subway`
+4. Initialize and seed the database
+5. Run `main.py`
 
-## Git clone this repository
-Clone this project.
+## Setting up Python and Virtual Environment
+### Python 3
+I'm on Apple Silicon and have Python set up via homebrew. If you want your set up to be like mine, install Python via brew. Otherwise, feel free to skip this step.
 ```sh
-➜ git clone https://github.com/injeyhwang/mta_rest_api.git
+brew install python@3.13
 ```
 
-## Download the latest regular GTFS static file
-> Regular GTFS: This file represents the "normal" subway schedule and does not include most temporary service changes, though some long term service changes may be included. It is typically updated a few times a year.
+Add PATH to your `.zshrc`.
+```sh
+echo 'export PATH="/opt/homebrew/bin:$PATH"' >> ~/.zshrc
+```
 
-The `/gtfs_subway` directory at root contains the Regular GTFS Static file downloaded and unzipped from [https://www.mta.info/developers](https://www.mta.info/developers).
+Verify your installations; you should be able to see the following (Apple Silicon):
+```sh
+➜ python3 --version
+Python 3.13.3
 
-Please go to the mta developer website above and download the latest Regular GTFS data into the root of this directory.
+➜ which python3
+/opt/homebrew/bin/python3
+```
 
-**Downloaded date: 04/24/2025**
+### Virtual Environment
+If you haven't done so, please change current working directory to the project root directory. Then create a python virtual environment.
+
+```sh
+➜ python3 -m venv .venv
+➜ source .venv/bin/activate
+```
+
+Install project dependencies with `pip`:
+```sh
+➜ pip3 install -r requirements.txt
+```
 
 ## Setting up PostgreSQL
 ### PostgreSQL
@@ -81,47 +99,22 @@ GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public TO mta_admin;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO mta_admin;
 ```
 
-## Setting up Python and Virtual Environment
-### Python 3
-I'm on Apple Silicon and have Python set up via homebrew. If you want your set up to be like mine, install Python via brew. Otherwise, feel free to skip this step.
+## [Optional] Download the latest regular GTFS static file
+If you'd like to use the latest regular GTFS Static data, you can go to [https://www.mta.info/developers](https://www.mta.info/developers) and download, unzip, and replace the `gtfs_subway` file into `app/db/` directory.
+
+> Regular GTFS: This file represents the "normal" subway schedule and does not include most temporary service changes, though some long term service changes may be included. It is typically updated a few times a year.
+
+**Regular GTFS Static downloaded date: 04/24/2025**
+
+## Initialize and seed the database
+At this point, you should have everything set up for the database scripts to work. If you're getting
+any error messages, take a look at them and debug by retrace your steps on this guide.
+
+If all set up accordingly, you should be able to run the db scripts.
 ```sh
-brew install python@3.13
-```
+➜ python3 -m app.db.scripts.init_db
 
-Add PATH to your `.zshrc`.
-```sh
-echo 'export PATH="/opt/homebrew/bin:$PATH"' >> ~/.zshrc
-```
-
-Verify your installations; you should be able to see the following (Apple Silicon):
-```sh
-➜ python3 --version
-Python 3.13.3
-
-➜ which python3
-/opt/homebrew/bin/python3
-```
-
-### Virtual Environment
-If you haven't done so, please change current working directory to the project root directory. Then create a python virtual environment.
-
-```sh
-➜ python3 -m venv .venv
-➜ source .venv/bin/activate
-```
-
-Install project dependencies with `pip`:
-```sh
-➜ pip3 install -r requirements.txt
-```
-
-## Seed the database with the latest `gtfa_subway` data
-At this point, you should have everything set up for the seeding script to work. If you're getting
-error messages, take a look at the messages and retrace your steps on this guide.
-
-If all set up accordingly, you should be able to run the seeding script.
-```sh
-➜ python3 -m scripts.seed_gtfs_static
+➜ python3 -m app.db.scripts.seed_db
 ```
 
 Now check your `mta_static_db` and it should be populated with all the GTFS data!
