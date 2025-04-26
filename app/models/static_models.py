@@ -70,5 +70,4 @@ class Trip(SQLModel, table=True):
     trip_headsign: str = Field(description="Text that appears on head signage")
     direction_id: int = Field(description="Direction of travel (1=inbound, 0=outbound)")
     shape_id: str | None = Field(default=None,
-                                 foreign_key="shape.shape_id",
                                  description="ID of the shape used for this trip")
