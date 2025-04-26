@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.router import v1_router
-from app.logger import logger
+from app.utils.logger import logger
 from app.config import settings
 
 

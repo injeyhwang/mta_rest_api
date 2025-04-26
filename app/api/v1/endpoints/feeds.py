@@ -3,7 +3,7 @@ from app.dependencies import get_mta_rt_service
 from app.models.realtime_models import Feed, FeedResponse
 from app.services.mta_realtime import MTAServiceRT
 
-from app.logger import logger
+from app.utils.logger import logger
 
 
 router = APIRouter()

@@ -6,7 +6,7 @@ from pathlib import Path
 import requests
 from typing import Dict, Optional
 
-from app.logger import logger
+from app.utils.logger import logger
 
 
 class MTAServiceRT:

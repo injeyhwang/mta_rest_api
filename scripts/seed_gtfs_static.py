@@ -5,7 +5,7 @@ from sqlmodel import create_engine, select, Session, SQLModel
 from typing import Any, Dict, List
 
 from app.models.static_models import Calendar, Route, Stop, Shape, StopTime, Transfer, Trip
-from app.logger import logger
+from app.utils.logger import logger
 
 
 DATABASE_URL = os.environ.get("DATABASE_URL")
