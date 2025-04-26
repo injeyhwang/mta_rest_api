@@ -16,7 +16,7 @@ router = APIRouter()
             description="Retrieve real-time data for a given subway feed",
             responses={502: {"description": "Error fetching GTFS-RT feed"},
                        504: {"description": "Timeout fetching GTFS-RT feed"}})
-async def get_ace_feed(feed: Feed = Path(description=""),
+async def get_subway_feed(feed: Feed = Path(description=""),
                        service: MTAServiceRT = Depends(get_mta_rt_service)) -> str:
     try:
         feed_data = service.get_mta_feed(feed.value)
