@@ -9,10 +9,10 @@ from typing import Dict
 from app.utils.logger import logger
 
 
-class MTAServiceRT:
+class MTAService:
     """
     MTA service object that loads GTFS-RT feed endpoints from mta_feed_urls.json and provides the
-    method: 'get_mta_rt_service(feed: MTAFeed)' to interact with MTA's GTFS-RT API.
+    method: 'get_mta_feed(feed: MTAFeed)' to interact with MTA's GTFS-RT API.
 
     Check https://api.mta.info/#/ for real time data feeds developer resources.
     """
@@ -68,9 +68,9 @@ class MTAServiceRT:
 
     def _load_endpoint_urls(self) -> Dict[str, str]:
         """
-        Load MTA feed endpoint URLs from 'mta_rt_feed_urls.json' file.
+        Load MTA feed endpoint URLs from 'mta_feed_urls.json' file.
 
-        This is an internal method and is not to be used outside of MTAServiceRT.
+        This is an internal method and is not to be used outside of MTAService.
 
         Returns:
             Dict[str, str]: Feed to API Endpoint key-value pairs.
@@ -83,7 +83,7 @@ class MTAServiceRT:
         """
         Get the endpoint URL for a specific MTA GTFS-RT feed.
 
-        This is an internal method and is not to be used outside of MTAServiceRT.
+        This is an internal method and is not to be used outside of MTAService.
 
         Args:
             feed (str): The feed to get the URL for.

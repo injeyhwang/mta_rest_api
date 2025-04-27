@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, Path, status
-from app.dependencies import get_mta_rt_service
+
+from app.dependencies import get_mta_service
 from app.models.realtime_models import Feed, FeedResponse
-from app.services.mta_realtime import MTAServiceRT
+from app.services.mta_service import MTAService
 
 from app.utils.logger import logger
 
@@ -16,8 +17,8 @@ router = APIRouter()
             description="Retrieve real-time data for a given subway feed",
             responses={502: {"description": "Error fetching GTFS-RT feed"},
                        504: {"description": "Timeout fetching GTFS-RT feed"}})
-async def get_subway_feed(feed: Feed = Path(description=""),
-                       service: MTAServiceRT = Depends(get_mta_rt_service)) -> str:
+async def get_subway_feed(feed: Feed = Path(description="The subway feed to request"),
+                          service: MTAService = Depends(get_mta_service)) -> FeedResponse:
     try:
         feed_data = service.get_mta_feed(feed.value)
         return FeedResponse(**feed_data)
