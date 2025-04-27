@@ -2,6 +2,7 @@
 # inheriting from SQLModel and registering them in the SQLModel.metadata.
 #
 # https://sqlmodel.tiangolo.com/tutorial/create-db-and-table/#sqlmodel-metadata-order-matters
+
 from app.db.database import get_db_engine, SQLModel
 from app.utils.logger import logger
 
@@ -30,6 +31,7 @@ def init_database():
             logger.info("Disposing database engine")
             engine.dispose()
             logger.info("Database connections closed")
+
 
 if __name__ == "__main__":
     init_database()

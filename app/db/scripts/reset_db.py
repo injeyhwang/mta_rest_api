@@ -2,9 +2,11 @@
 # inheriting from SQLModel and registering them in the SQLModel.metadata.
 #
 # https://sqlmodel.tiangolo.com/tutorial/create-db-and-table/#sqlmodel-metadata-order-matters
+
 from app.db.database import get_db_engine, SQLModel
 from app.db.scripts.init_db import create_db_tables
 from app.utils.logger import logger
+
 
 def drop_all_tables(engine):
     """

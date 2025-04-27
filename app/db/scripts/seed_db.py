@@ -1,20 +1,19 @@
+# SQLModel is imported from app.db.database because Python executes all the code creating the classes
+# inheriting from SQLModel and registering them in the SQLModel.metadata.
+#
+# https://sqlmodel.tiangolo.com/tutorial/create-db-and-table/#sqlmodel-metadata-order-matters
+
 import csv
 from datetime import datetime
 import os
 from sqlmodel import select, Session
 from typing import Any, Dict, List
 
-# SQLModel is imported from app.db.database because Python executes all the code creating the classes
-# inheriting from SQLModel and registering them in the SQLModel.metadata.
-#
-# https://sqlmodel.tiangolo.com/tutorial/create-db-and-table/#sqlmodel-metadata-order-matters
+from app.config import settings
 from app.db.database import get_db_engine, SQLModel
 from app.db.models import Calendar, Route, Stop, Shape, StopTime, Transfer, Trip
 from app.db.scripts.init_db import create_db_tables
 from app.utils.logger import logger
-
-
-GTFS_DIR_PATH = os.environ.get("GTFS_DIR_PATH")
 
 
 def read_csv_file(file_path: str) -> List[Dict[str, Any]]:
@@ -72,7 +71,7 @@ def convert_field_types(data: List[Dict[str, Any]], model_class: SQLModel) -> Li
 
 def seed_routes(session: Session):
     try:
-        routes_file_path = os.path.join(GTFS_DIR_PATH, "routes.txt")
+        routes_file_path = os.path.join(settings.gtfs_dir_path, "routes.txt")
         if not os.path.exists(routes_file_path):
             raise FileNotFoundError(f"Routes file not found at: '{routes_file_path}'")
 
@@ -95,7 +94,7 @@ def seed_routes(session: Session):
 
 def seed_stops(session: Session):
     try:
-        stops_file_path = os.path.join(GTFS_DIR_PATH, "stops.txt")
+        stops_file_path = os.path.join(settings.gtfs_dir_path, "stops.txt")
         if not os.path.exists(stops_file_path):
             raise FileNotFoundError(f"Stops file not found at: '{stops_file_path}'")
 
@@ -129,7 +128,7 @@ def seed_stops(session: Session):
 
 def seed_calendar(session: Session):
     try:
-        calendar_file_path = os.path.join(GTFS_DIR_PATH, "calendar.txt")
+        calendar_file_path = os.path.join(settings.gtfs_dir_path, "calendar.txt")
         if not os.path.exists(calendar_file_path):
             raise FileNotFoundError(f"Calendar file not found at: '{calendar_file_path}'")
 
@@ -152,7 +151,7 @@ def seed_calendar(session: Session):
 
 def seed_shapes(session: Session):
     try:
-        shapes_file_path = os.path.join(GTFS_DIR_PATH, "shapes.txt")
+        shapes_file_path = os.path.join(settings.gtfs_dir_path, "shapes.txt")
         if not os.path.exists(shapes_file_path):
             raise FileNotFoundError(f"Shapes file not found: {shapes_file_path}")
 
@@ -175,7 +174,7 @@ def seed_shapes(session: Session):
 
 def seed_trips(session: Session):
     try:
-        trips_file_path = os.path.join(GTFS_DIR_PATH, "trips.txt")
+        trips_file_path = os.path.join(settings.gtfs_dir_path, "trips.txt")
         if not os.path.exists(trips_file_path):
             raise FileNotFoundError(f"Trips file not found: '{trips_file_path}'")
 
@@ -198,7 +197,7 @@ def seed_trips(session: Session):
 
 def seed_stop_times(session: Session):
     try:
-        stop_times_file_path = os.path.join(GTFS_DIR_PATH, "stop_times.txt")
+        stop_times_file_path = os.path.join(settings.gtfs_dir_path, "stop_times.txt")
         if not os.path.exists(stop_times_file_path):
             raise FileNotFoundError(f"Stop times file not found: '{stop_times_file_path}'")
 
@@ -240,7 +239,7 @@ def seed_stop_times(session: Session):
 
 def seed_transfers(session: Session):
     try:
-        transfers_file_path = os.path.join(GTFS_DIR_PATH, "transfers.txt")
+        transfers_file_path = os.path.join(settings.gtfs_dir_path, "transfers.txt")
         if not os.path.exists(transfers_file_path):
             raise FileNotFoundError(f"Transfers file not found: '{transfers_file_path}'")
 
@@ -268,8 +267,8 @@ def seed_database():
     start_time = datetime.now()
     logger.info(f"Starting GTFS data seeding at {start_time}")
 
-    if not os.path.exists(GTFS_DIR_PATH):
-        logger.error(f"GTFS directory not found at: '{GTFS_DIR_PATH}'")
+    if not os.path.exists(settings.gtfs_dir_path):
+        logger.error(f"GTFS directory not found at: '{settings.gtfs_dir_path}'")
         return
 
     try:

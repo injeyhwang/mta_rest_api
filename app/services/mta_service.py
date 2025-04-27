@@ -6,6 +6,7 @@ from pathlib import Path
 import requests
 from typing import Dict
 
+from app.config import settings
 from app.utils.logger import logger
 
 
@@ -75,7 +76,7 @@ class MTAService:
         Returns:
             Dict[str, str]: Feed to API Endpoint key-value pairs.
         """
-        json_file_path = Path("app/services/mta_rt_feed_urls.json")
+        json_file_path = Path(settings.mta_feed_urls_path)
         with open(json_file_path, "r", encoding="utf-8") as f:
             return json.load(f)
 

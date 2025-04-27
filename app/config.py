@@ -4,8 +4,8 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     """
-    FastAPI server configurations via pydantic-settings. All server configs and metadata info are
-    defined here and utilized on server instantiation.
+    FastAPI project configurations via pydantic-settings. All server configs and metadata info are
+    defined here as well as environment variables to be used in the entire codebase.
     """
 
     # App info
@@ -21,6 +21,11 @@ class Settings(BaseSettings):
 
     # Debug mode
     debug: bool = True
+
+    # .env variables
+    database_url_path: str
+    gtfs_dir_path: str
+    mta_feed_urls_path: str
 
 
 settings = Settings()
