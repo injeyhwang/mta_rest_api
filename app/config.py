@@ -1,5 +1,5 @@
 from typing import List
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -7,10 +7,12 @@ class Settings(BaseSettings):
     FastAPI project configurations via pydantic-settings. All server configs and metadata info are
     defined here as well as environment variables to be used in the entire codebase.
     """
+    # Dotenv support
+    model_config = SettingsConfigDict(env_file='.env', env_file_encoding='utf-8')
 
     # App info
     app_name: str = "mta_rest_api"
-    app_version: str = "0.4.0"
+    app_version: str = "0.4.1"
     app_description: str = "A simple REST API reverse proxy for MTA's complicated GTFS and GTFS-RT APIs."
 
     # API route prefix
