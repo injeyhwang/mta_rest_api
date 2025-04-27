@@ -119,6 +119,15 @@ If all set up accordingly, you should be able to run the db scripts.
 
 Now check your `mta_static_db` and it should be populated with all the GTFS data!
 
+If in the future you'd like to reset the database with the latest data, you can use the `reset_db`
+script to drop everything from the database and initialize the database with tables. You could then
+run the seeding script to import over the latest GTFS static data.
+```sh
+➜ python3 -m app.db.scripts.reset_db
+
+➜ python3 -m app.db.scripts.seed_db
+```
+
 ## Run FastAPI locally
 Finally, run the server.
 

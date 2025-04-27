@@ -3,27 +3,33 @@
 #
 # https://sqlmodel.tiangolo.com/tutorial/create-db-and-table/#sqlmodel-metadata-order-matters
 from app.db.database import get_db_engine, SQLModel
+from app.db.scripts.init_db import create_db_tables
 from app.utils.logger import logger
 
-
-def create_db_tables(engine):
+def drop_all_tables(engine):
     """
-    Create all database tables defined in SQLModel metadata if they don't exist.
+    Drop all tables defined in SQLModel metadata.
     """
-    logger.info("Creating database tables if they don't exist")
-    SQLModel.metadata.create_all(engine)
+    try:
+        logger.info(f"Dropping all database tables")
+        SQLModel.metadata.drop_all(engine)
+        logger.info("All tables dropped successfully")
+    except Exception as e:
+        logger.exception(f"Error dropping tables: {e}")
+        raise
 
 
-def init_database():
+def reset_database():
     """
-    Initialize the database by creating the engine and all tables.
+    Reset the database by dropping all tables and then recreating them.
     """
     try:
         engine = get_db_engine()
+        drop_all_tables(engine)
         create_db_tables(engine)
-        logger.info("Database initialization completed")
+        logger.info("Database reset completed")
     except Exception as e:
-        logger.exception(f"Database initialization failed: {e}")
+        logger.exception(f"Database reset failed: {e}")
         raise
     finally:
         if engine:
@@ -31,5 +37,6 @@ def init_database():
             engine.dispose()
             logger.info("Database connections closed")
 
+
 if __name__ == "__main__":
-    init_database()
+    reset_database()

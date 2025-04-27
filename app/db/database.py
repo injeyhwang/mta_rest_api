@@ -29,10 +29,9 @@ def get_db_engine():
     return engine
 
 
-def get_session():
+def get_db_session():
     """
-    Creates a new database session and closes it after use. This function is designed to be used
-    as a FastAPI dependency.
+    Creates a new database session and closes it after use.
 
     Yields:
         Session: A SQLModel session connected to the database.

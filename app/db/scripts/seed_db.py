@@ -4,6 +4,10 @@ import os
 from sqlmodel import select, Session
 from typing import Any, Dict, List
 
+# SQLModel is imported from app.db.database because Python executes all the code creating the classes
+# inheriting from SQLModel and registering them in the SQLModel.metadata.
+#
+# https://sqlmodel.tiangolo.com/tutorial/create-db-and-table/#sqlmodel-metadata-order-matters
 from app.db.database import get_db_engine, SQLModel
 from app.db.models import Calendar, Route, Stop, Shape, StopTime, Transfer, Trip
 from app.db.scripts.init_db import create_db_tables
