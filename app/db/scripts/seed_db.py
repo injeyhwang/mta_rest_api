@@ -1,12 +1,13 @@
 import csv
 from datetime import datetime
 import os
-from sqlmodel import select, Session, SQLModel
+from sqlmodel import select, Session
 from typing import Any, Dict, List
 
+from app.db.database import get_db_engine, SQLModel
 from app.db.models import Calendar, Route, Stop, Shape, StopTime, Transfer, Trip
+from app.db.scripts.init_db import create_db_tables
 from app.utils.logger import logger
-from app.db.scripts.init_db import get_db_engine, create_db_tables
 
 
 GTFS_DIR_PATH = os.environ.get("GTFS_DIR_PATH")

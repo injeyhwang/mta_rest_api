@@ -1,18 +1,5 @@
-import os
-
-from sqlmodel import create_engine, SQLModel
+from app.db.database import get_db_engine, SQLModel
 from app.utils.logger import logger
-
-
-def get_db_engine():
-    """
-    Create and return a database engine based on the DATABASE_URL environment variable.
-    """
-    DATABASE_URL = os.environ.get("DATABASE_URL")
-    database_name = DATABASE_URL.split("/")[-1]
-    logger.info(f"Connecting to database: '{database_name}'")
-    engine = create_engine(DATABASE_URL)
-    return engine
 
 
 def create_db_tables(engine):
