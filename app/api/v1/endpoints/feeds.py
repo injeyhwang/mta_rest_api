@@ -7,7 +7,7 @@ from app.exceptions.mta import (
     MTAFeedTimeoutError,
     MTAFeedProcessingError
 )
-from app.schemas.realtime_schemas import Feed, PaginatedFeedResponse
+from app.schemas.realtime import Feed, PaginatedFeedResponse
 from app.services.mta_service import MTAService
 
 from app.utils.logger import logger

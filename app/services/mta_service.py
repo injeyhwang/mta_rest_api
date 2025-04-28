@@ -14,7 +14,7 @@ from app.exceptions.mta import (
     MTAFeedTimeoutError,
     MTAFeedProcessingError
 )
-from app.schemas.realtime_schemas import FeedResponse
+from app.schemas.realtime import FeedResponse
 from app.utils.logger import logger
 
 
