@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Path, status
 
 from app.dependencies import get_mta_service
-from app.models.realtime_models import Feed, FeedResponse
+from app.schemas.realtime_schemas import Feed, FeedResponse
 from app.services.mta_service import MTAService
 
 from app.utils.logger import logger
