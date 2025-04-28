@@ -65,11 +65,3 @@ class FeedHeader(BaseModel):
 class FeedResponse(BaseModel):
     header: FeedHeader
     entity: List[Entity] = Field(description="List of feed entities")
-
-
-class PaginatedFeedResponse(BaseModel):
-    header: FeedHeader
-    total: int = Field(description="Total number of entities across all pages")
-    offset: int = Field(description="Number of entities skipped")
-    limit: int = Field(description="Maximum number of entities per page")
-    results: List[Entity] = Field(description="List of feed entities")
