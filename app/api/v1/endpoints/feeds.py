@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, Response, status
 
-from app.dependencies import get_mta_service
+from app.dependencies import get_realtime_service
 from app.exceptions.mta import (
     MTAEndpointNotFoundError,
     MTAFeedFetchError,
@@ -9,7 +9,7 @@ from app.exceptions.mta import (
 )
 from app.schemas.realtime import Entity, Feed
 from app.schemas.pagination import PaginatedResponse
-from app.services.mta_service import MTAService
+from app.services.realtime import MTAService
 
 from app.utils.logger import logger
 
@@ -32,7 +32,7 @@ async def get_subway_feed(response: Response,
                                              ge=1,
                                              le=500,
                                              description="Maximum number of entities to return"),
-                          service: MTAService = Depends(get_mta_service)) -> PaginatedResponse:
+                          service: MTAService = Depends(get_realtime_service)) -> PaginatedResponse:
     try:
         res, total = service.get_paginated_mta_feed(feed.value, offset, limit)
 

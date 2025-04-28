@@ -1,7 +1,7 @@
 from sqlmodel import Session
 
 from app.db.database import get_db_session as db_session
-from app.services.mta_service import MTAService
+from app.services.realtime import MTAService
 
 
 mta_service = MTAService()
@@ -15,7 +15,7 @@ def get_db_session() -> Session:
     return db_session
 
 
-def get_mta_service() -> MTAService:
+def get_realtime_service() -> MTAService:
     """
     A singleton for MTAService instance. The MTAService object will be dependency injected into feed
     API routes.

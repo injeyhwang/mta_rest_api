@@ -20,8 +20,8 @@ from app.utils.logger import logger
 
 class MTAService:
     """
-    MTA service object that loads GTFS-RT feed endpoints from mta_feed_urls.json and provides the
-    method: 'get_mta_feed(feed: MTAFeed)' to interact with MTA's GTFS-RT API.
+    MTA service object that loads GTFS-RT feed endpoints from mta_feed_urls.json and provides methods
+    to to interact with MTA's GTFS-RT API.
 
     Check https://api.mta.info/#/ for real time data feeds developer resources.
     """
