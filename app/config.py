@@ -25,7 +25,6 @@ class Settings(BaseSettings):
     debug: bool = True
 
     # .env database variables
-    db_system: str
     db_user: str
     db_password: str
     db_name: str

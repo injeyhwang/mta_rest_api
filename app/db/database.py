@@ -10,7 +10,7 @@ import app.db.models
 from app.utils.logger import logger
 
 
-DATABASE_URL = f"{s.db_system}://{s.db_user}:{s.db_password}@{s.db_host}:{s.db_port}/{s.db_name}"
+DATABASE_URL = f"postgresql://{s.db_user}:{s.db_password}@{s.db_host}:{s.db_port}/{s.db_name}"
 
 
 engine = create_engine(
