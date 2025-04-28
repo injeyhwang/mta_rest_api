@@ -5,17 +5,21 @@
 
 from sqlmodel import SQLModel, create_engine, Session
 
-from app.config import settings
+from app.config import settings as s
 import app.db.models
 from app.utils.logger import logger
 
 
+DATABASE_URL = f"{s.db_system}://{s.db_user}:{s.db_password}@{s.db_host}:{s.db_port}/{s.db_name}"
+
+
 engine = create_engine(
-    settings.database_url_path,
+    DATABASE_URL,
     echo=False,         # set to True for SQL query logging (development only)
     pool_pre_ping=True, # verify connection is still alive before using from pool
     pool_recycle=3600,  # recycle connections after one hour to avoid stale connections
 )
+
 
 def get_db_engine():
     """
@@ -24,7 +28,7 @@ def get_db_engine():
     Returns:
         Engine: A SQLModel engine that handles the connection and communication with the database.
     """
-    database_name = settings.database_url_path.split("/")[-1]
+    database_name = DATABASE_URL.split("/")[-1]
     logger.info(f"Using database: '{database_name}'")
     return engine
 
