@@ -10,11 +10,10 @@ from app.exceptions.mta import (
 from app.schemas.realtime import Entity, Feed
 from app.schemas.pagination import PaginatedResponse
 from app.services.realtime import MTAService
-
 from app.utils.logger import logger
 
 
-router = APIRouter()
+router = APIRouter(prefix="/feeds", tags=["feeds"])
 
 
 @router.get("/{feed}",
@@ -32,7 +31,7 @@ async def get_subway_feed(response: Response,
                                              ge=1,
                                              le=500,
                                              description="Maximum number of entities to return"),
-                          service: MTAService = Depends(get_realtime_service)) -> PaginatedResponse:
+                          service: MTAService = Depends(get_realtime_service)) -> PaginatedResponse[Entity]:
     try:
         res, total = service.get_paginated_mta_feed(feed.value, offset, limit)
 
@@ -63,4 +62,4 @@ async def get_subway_feed(response: Response,
     except Exception as e:
         logger.exception(f"Unexpected error for feed '{feed}': {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                           detail="An unexpected error occurred")
+                            detail="An unexpected error occurred")
