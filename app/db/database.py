@@ -3,7 +3,7 @@
 #
 # https://sqlmodel.tiangolo.com/tutorial/create-db-and-table/#sqlmodel-metadata-order-matters
 
-from sqlmodel import SQLModel, create_engine, Session
+from sqlmodel import SQLModel, create_engine
 
 from app.config import settings as s
 import app.db.models
@@ -31,17 +31,3 @@ def get_db_engine():
     database_name = DATABASE_URL.split("/")[-1]
     logger.info(f"Using database: '{database_name}'")
     return engine
-
-
-def get_db_session():
-    """
-    Creates a new database session and closes it after use.
-
-    Yields:
-        Session: A SQLModel session connected to the database.
-    """
-    with Session(engine) as session:
-        try:
-            yield session
-        finally:
-            session.close()
