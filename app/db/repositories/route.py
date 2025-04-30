@@ -1,7 +1,7 @@
 from sqlmodel import Session, select
 from typing import List
 
-from app.db.models import Route, Trip, StopTime
+from app.db.models import Route
 from app.schemas.base import RouteResponse
 
 

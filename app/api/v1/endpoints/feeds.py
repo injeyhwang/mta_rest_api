@@ -19,7 +19,7 @@ router = APIRouter(prefix="/feeds", tags=["feeds"])
 @router.get("/{feed}",
             response_model=PaginatedResponse[Entity],
             status_code=status.HTTP_200_OK,
-            summary="Get real-time subway line feed",
+            summary="Get real-time subway feed",
             description="Retrieve real-time data for a given subway feed",
             responses={500: {"description": "Error processing GTFS-RT feed"},
                        502: {"description": "Error fetching GTFS-RT feed"},

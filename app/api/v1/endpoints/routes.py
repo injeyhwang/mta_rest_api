@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Path, status
 from sqlmodel import Session
 from typing import List
 
@@ -14,8 +14,8 @@ router = APIRouter(prefix="/routes", tags=["routes"])
 @router.get("/",
             response_model=List[RouteResponse],
             status_code=status.HTTP_200_OK,
-            summary="Get all subway line routes",
-            description="Retrieve all subway line routes with minimum info",
+            summary="Get all subway routes",
+            description="Retrieve all subway routes",
             responses={500: {"description": "Error retrieving routes"}})
 def get_routes(session: Session = Depends(get_db_session)) -> List[RouteResponse]:
     try:
@@ -31,11 +31,12 @@ def get_routes(session: Session = Depends(get_db_session)) -> List[RouteResponse
 @router.get("/{route_id}",
             response_model=RouteResponse,
             status_code=status.HTTP_200_OK,
-            summary="Get subway line route by ID",
-            description="Retrieve the subway line route by given ID",
+            summary="Get subway route by ID",
+            description="Retrieve the subway route by given ID",
             responses={404: {"description": "Route not found"},
-                       500: {"description": "Error retrieving routes"}})
-def get_route_by_id(route_id: str, session: Session = Depends(get_db_session)) -> RouteResponse:
+                       500: {"description": "Error retrieving route"}})
+def get_route_by_id(route_id: str = Path(description="The route ID to search"),
+                    session: Session = Depends(get_db_session)) -> RouteResponse:
     try:
         route_repo = RouteRepository(session)
         found = route_repo.get_by_id(route_id)

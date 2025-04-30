@@ -4,7 +4,7 @@ from google.transit import gtfs_realtime_pb2
 import json
 from pathlib import Path
 import requests
-from typing import Dict
+from typing import Dict, Tuple
 
 from app.config import settings
 from app.exceptions.mta import (
@@ -77,7 +77,7 @@ class MTAService:
             logger.exception(f"Error processing GTFS-RT feed: {e}")
             raise MTAFeedProcessingError(f"Error processing GTFS-RT feed: {e}")
 
-    def get_paginated_mta_feed(self, feed: str, offset: int, limit: int) -> tuple[FeedResponse, int]:
+    def get_paginated_mta_feed(self, feed: str, offset: int, limit: int) -> Tuple[FeedResponse, int]:
         """
         Get paginated real-time data from MTA's GTFS-RT API for the specified feed.
 
@@ -87,7 +87,7 @@ class MTAService:
             limit (int): Maximum number of items to return
 
         Returns:
-            Tuple of (paginated: FeedResponse, total_items: int)
+            Tuple of (feed_data: FeedResponse, total_items: int)
         """
         feed_data = self.get_mta_feed(feed)
         total_items = len(feed_data.entity)
