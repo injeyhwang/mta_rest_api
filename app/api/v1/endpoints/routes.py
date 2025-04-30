@@ -36,14 +36,11 @@ def get_routes(service: RouteService = Depends(get_route_service)) -> List[Route
 def get_route_by_id(route_id: str = Path(description="The route ID to search"),
                     service: RouteService = Depends(get_route_service)) -> RouteResponse:
     try:
+        return service.get_by_id(route_id)
 
-        route = service.get_by_id(route_id)
-        if not route:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Route not found")
-        return route
-
-    except HTTPException:
-        raise
+    except ValueError:
+        logger.error(f"Route with ID '{route_id}' not found: {e}")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Route not found")
 
     except Exception as e:
         logger.exception(f"Unexpected error: {e}")
