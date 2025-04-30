@@ -7,20 +7,20 @@ import requests
 from typing import Dict, Tuple
 
 from app.config import settings
-from app.exceptions.mta import (
-    MTAServiceError,
-    MTAEndpointNotFoundError,
-    MTAFeedFetchError,
-    MTAFeedTimeoutError,
-    MTAFeedProcessingError
+from app.exceptions.feed import (
+    FeedServiceError,
+    FeedEndpointNotFoundError,
+    FeedFetchError,
+    FeedTimeoutError,
+    FeedProcessingError
 )
-from app.schemas.realtime import FeedResponse
+from app.schemas.feed import FeedResponse
 from app.utils.logger import logger
 
 
-class MTAService:
+class FeedService:
     """
-    MTA service object that loads GTFS-RT feed endpoints from mta_feed_urls.json and provides methods
+    FeedService object that loads GTFS-RT feed endpoints from mta_feed_urls.json and provides methods
     to to interact with MTA's GTFS-RT API.
 
     Check https://api.mta.info/#/ for real time data feeds developer resources.
@@ -29,7 +29,7 @@ class MTAService:
     def __init__(self):
         self.mta_endpoints = self._load_endpoint_urls()
 
-    def get_mta_feed(self, feed: str) -> FeedResponse:
+    def get_feed(self, feed: str) -> FeedResponse:
         """
         Get real-time data from MTA's GTFS-RT API for the specified feed.
 
@@ -37,10 +37,10 @@ class MTAService:
             feed (str): MTA real time service to request
 
         Raises:
-            MTAEndpointNotFoundError: Feed endpoint configuration is missing
-            MTAFeedFetchError: Error fetching feed from MTA API
-            MTAFeedTimeoutError: Request to MTA API timed out
-            MTAFeedProcessingError: Error processing the feed data
+            FeedEndpointNotFoundError: Feed endpoint configuration is missing
+            FeedFetchError: Error fetching feed from MTA API
+            FeedTimeoutError: Request to MTA API timed out
+            FeedProcessingError: Error processing the feed data
 
         Returns:
             FeedResponse: Parsed GTFS-RT message for a specific feed.
@@ -48,7 +48,7 @@ class MTAService:
         mta_endpoint: str = self._get_endpoint_url(feed=feed)
         if not mta_endpoint:
             logger.error(f"No endpoint configuration found for feed: '{feed}'")
-            raise MTAEndpointNotFoundError(f"No endpoint configuration found for feed: '{feed}'")
+            raise FeedEndpointNotFoundError(f"No endpoint configuration found for feed: '{feed}'")
 
         logger.info(f"Fetching GTFS-RT feed from endpoint: '{mta_endpoint}'")
         feed_message = gtfs_realtime_pb2.FeedMessage()
@@ -57,7 +57,7 @@ class MTAService:
             res = requests.get(mta_endpoint, timeout=10)
             if res.status_code != status.HTTP_200_OK:
                 logger.error(f"Error fetching GTFS-RT feed. Status code: {res.status_code}")
-                raise MTAFeedFetchError(f"Error fetching GTFS-RT feed: HTTP {res.status_code}")
+                raise FeedFetchError(f"Error fetching GTFS-RT feed: HTTP {res.status_code}")
 
             logger.info("Parsing GTFS-RT feed")
             feed_message.ParseFromString(res.content)
@@ -68,16 +68,16 @@ class MTAService:
 
         except requests.exceptions.Timeout:
             logger.error("Timeout while fetching GTFS-RT feed")
-            raise MTAFeedTimeoutError("Timeout while fetching GTFS-RT feed")
+            raise FeedTimeoutError("Timeout while fetching GTFS-RT feed")
 
-        except MTAServiceError:
+        except FeedServiceError:
             raise
 
         except Exception as e:
             logger.exception(f"Error processing GTFS-RT feed: {e}")
-            raise MTAFeedProcessingError(f"Error processing GTFS-RT feed: {e}")
+            raise FeedProcessingError(f"Error processing GTFS-RT feed: {e}")
 
-    def get_paginated_mta_feed(self, feed: str, offset: int, limit: int) -> Tuple[FeedResponse, int]:
+    def get_paginated_feed(self, feed: str, offset: int, limit: int) -> Tuple[FeedResponse, int]:
         """
         Get paginated real-time data from MTA's GTFS-RT API for the specified feed.
 
@@ -87,9 +87,9 @@ class MTAService:
             limit (int): Maximum number of items to return
 
         Returns:
-            Tuple of (feed_data: FeedResponse, total_items: int)
+            Tuple[FeedResponse, int]: Tuple of FeedResponse and total_items
         """
-        feed_data = self.get_mta_feed(feed)
+        feed_data = self.get_feed(feed)
         total_items = len(feed_data.entity)
 
         # must handle pagination in-memory because MTA API doesn't offer this feature 😭
@@ -101,7 +101,7 @@ class MTAService:
         """
         Load MTA feed endpoint URLs from 'mta_feed_urls.json' file.
 
-        This is an internal method and is not to be used outside of MTAService.
+        This is an internal method and is not to be used outside of FeedService.
 
         Returns:
             Dict[str, str]: Feed to API Endpoint key-value pairs.
@@ -114,7 +114,7 @@ class MTAService:
         """
         Get the endpoint URL for a specific MTA GTFS-RT feed.
 
-        This is an internal method and is not to be used outside of MTAService.
+        This is an internal method and is not to be used outside of FeedService.
 
         Args:
             feed (str): The feed to get the URL for.
@@ -123,3 +123,6 @@ class MTAService:
             str | None: The endpoint URL, or None if not found.
         """
         return self.mta_endpoints.get(feed)
+
+
+feed_service = FeedService()

@@ -63,5 +63,5 @@ class FeedHeader(BaseModel):
 
 
 class FeedResponse(BaseModel):
-    header: FeedHeader
+    header: FeedHeader = Field(description="GTFS-RT header metadata")
     entity: List[Entity] = Field(description="List of feed entities")

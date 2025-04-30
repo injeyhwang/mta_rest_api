@@ -1,26 +1,26 @@
 from app.exceptions.base import ServiceError
 
 
-class MTAServiceError(ServiceError):
-    """Base exception for MTA service errors"""
+class FeedServiceError(ServiceError):
+    """Base exception for MTA Feed service errors"""
     pass
 
 
-class MTAEndpointNotFoundError(MTAServiceError):
+class FeedEndpointNotFoundError(FeedServiceError):
     """Raised when a feed endpoint configuration is missing"""
     pass
 
 
-class MTAFeedFetchError(MTAServiceError):
+class FeedFetchError(FeedServiceError):
     """Raised when there's an error fetching the feed from MTA API"""
     pass
 
 
-class MTAFeedTimeoutError(MTAServiceError):
+class FeedTimeoutError(FeedServiceError):
     """Raised when a request to the MTA API times out"""
     pass
 
 
-class MTAFeedProcessingError(MTAServiceError):
+class FeedProcessingError(FeedServiceError):
     """Raised when there's an error processing the feed data"""
     pass

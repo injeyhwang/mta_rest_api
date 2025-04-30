@@ -3,12 +3,9 @@ from fastapi import Depends
 from typing import Any, Generator
 
 from app.db.database import engine
-from app.services.realtime import MTAService
+from app.services.feed import feed_service, FeedService
 from app.services.route import RouteService
 from app.services.trip import TripService
-
-
-mta_service = MTAService()
 
 
 def get_db_session() -> Generator[Session, Any, None]:
@@ -24,6 +21,17 @@ def get_db_session() -> Generator[Session, Any, None]:
             yield session
         finally:
             session.close()
+
+
+def get_feed_service() -> FeedService:
+    """
+    A getter function for the FeedService instance. The FeedService object will be dependency injected
+    into the feeds API endpoints.
+
+    Returns:
+        FeedService: A service layer for the MTA GTFS-RT API.
+    """
+    return feed_service
 
 
 def get_route_service(session: Session = Depends(get_db_session)) -> RouteService:
@@ -46,14 +54,3 @@ def get_trip_service(session: Session = Depends(get_db_session)) -> RouteService
         TripService: A service layer for the Trip GTFS Static data.
     """
     return TripService(session)
-
-
-def get_realtime_service() -> MTAService:
-    """
-    A getter function for the MTAService instance. The MTAService object will be dependency injected
-    into the feeds API endpoints.
-
-    Returns:
-        MTAService: A service layer for the MTA GTFS-RT API.
-    """
-    return mta_service
