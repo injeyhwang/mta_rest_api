@@ -5,6 +5,7 @@ from typing import Any, Generator
 from app.db.database import engine
 from app.services.realtime import MTAService
 from app.services.route import RouteService
+from app.services.trip import TripService
 
 
 mta_service = MTAService()
@@ -27,8 +28,8 @@ def get_db_session() -> Generator[Session, Any, None]:
 
 def get_route_service(session: Session = Depends(get_db_session)) -> RouteService:
     """
-    Get RouteService instance. The RouteService object will be dependency injected into the route
-    API endpoints.
+    A getter function for the RouteService instance. The RouteService object will be dependency
+    injected into the routes API endpoints.
 
     Returns:
         RouteService: A service layer for the Route GTFS Static data.
@@ -36,10 +37,21 @@ def get_route_service(session: Session = Depends(get_db_session)) -> RouteServic
     return RouteService(session)
 
 
+def get_trip_service(session: Session = Depends(get_db_session)) -> RouteService:
+    """
+    A getter function for the TripService instance. The TripService object will be dependency
+    injected into the trips API endpoints.
+
+    Returns:
+        TripService: A service layer for the Trip GTFS Static data.
+    """
+    return TripService(session)
+
+
 def get_realtime_service() -> MTAService:
     """
-    A singleton for MTAService instance. The MTAService object will be dependency injected into feed
-    API routes.
+    A getter function for the MTAService instance. The MTAService object will be dependency injected
+    into the feeds API endpoints.
 
     Returns:
         MTAService: A service layer for the MTA GTFS-RT API.
