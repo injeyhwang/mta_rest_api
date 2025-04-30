@@ -2,14 +2,13 @@ from sqlmodel import Session, select
 from typing import List
 
 from app.db.models import Route
-from app.schemas.base import RouteResponse
 
 
 class RouteRepository:
     def __init__(self, session: Session):
         self.session = session
 
-    def get_by_id(self, route_id: str) -> RouteResponse | None:
+    def get_by_id(self, route_id: str) -> Route | None:
         """
         Get a single route by ID.
 
@@ -21,7 +20,7 @@ class RouteRepository:
         """
         return self.session.get(Route, route_id)
 
-    def get_all(self) -> List[RouteResponse]:
+    def get_all(self) -> List[Route]:
         """
         Get all routes.
 
