@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Path, status
 from typing import List
 
 from app.dependencies import get_route_service
-from app.schemas.base import RouteResponse
+from app.schemas.route import RouteResponse
 from app.services.route import RouteService
 from app.utils.logger import logger
 

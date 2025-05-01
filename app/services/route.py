@@ -3,7 +3,7 @@ from typing import List
 
 from app.db.repositories.route import RouteRepository
 from app.db.models import Route
-from app.schemas.base import RouteResponse
+from app.schemas.route import RouteResponse
 
 
 class RouteService:
