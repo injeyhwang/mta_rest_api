@@ -5,6 +5,7 @@ from typing import Any, Generator
 from app.db.database import engine
 from app.services.feed import feed_service, FeedService
 from app.services.route import RouteService
+from app.services.stop import StopService
 from app.services.trip import TripService
 
 
@@ -43,6 +44,17 @@ def get_route_service(session: Session = Depends(get_db_session)) -> RouteServic
         RouteService: A service layer for the Route GTFS Static data.
     """
     return RouteService(session)
+
+
+def get_stop_service(session: Session = Depends(get_db_session)) -> StopService:
+    """
+    A getter function for the StopService instance. The StopService object will be dependency
+    injected into the stops API endpoints.
+
+    Returns:
+        StopService: A service layer for the Stop GTFS Static data.
+    """
+    return StopService(session)
 
 
 def get_trip_service(session: Session = Depends(get_db_session)) -> RouteService:
