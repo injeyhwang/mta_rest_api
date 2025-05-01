@@ -38,7 +38,7 @@ def get_route_by_id(route_id: str = Path(description="The route ID to search"),
     try:
         return service.get_by_id(route_id)
 
-    except ValueError:
+    except ValueError as e:
         logger.error(f"Route with ID '{route_id}' not found: {e}")
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Route not found")
 
