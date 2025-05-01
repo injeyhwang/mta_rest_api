@@ -2,8 +2,8 @@ from sqlmodel import Session
 
 from app.db.models import Trip
 from app.db.repositories.trip import TripRepository
-from app.schemas.base import TripResponse
 from app.schemas.pagination import PaginatedResponse
+from app.schemas.trip import TripResponse
 
 
 class TripService:

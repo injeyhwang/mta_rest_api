@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
 
 from app.dependencies import get_trip_service
-from app.schemas.base import DirectionID, ServiceID, TripResponse
 from app.schemas.pagination import PaginatedResponse
+from app.schemas.trip import DirectionID, ServiceID, TripResponse
 from app.services.trip import TripService
 from app.utils.logger import logger
 
