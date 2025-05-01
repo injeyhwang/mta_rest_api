@@ -24,10 +24,10 @@ class RouteService:
         return results
 
     def _responsify(self, route: Route) -> RouteResponse:
-        return RouteResponse(route_id=route.route_id,
-                             route_short_name=route.route_short_name,
-                             route_long_name=route.route_long_name,
-                             route_desc=route.route_desc,
-                             route_url=route.route_url,
-                             route_color=route.route_color,
-                             route_text_color=route.route_text_color)
+        return RouteResponse(id=route.route_id,
+                             short_name=route.route_short_name,
+                             long_name=route.route_long_name,
+                             description=route.route_desc,
+                             url=route.route_url,
+                             color=route.route_color,
+                             text_color=route.route_text_color)

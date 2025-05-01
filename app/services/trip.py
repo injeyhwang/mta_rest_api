@@ -31,8 +31,8 @@ class TripService:
         return PaginatedResponse[TripResponse](total=total, offset=offset, limit=limit, results=results)
 
     def _responsify(self, trip: Trip) -> TripResponse:
-        return TripResponse(trip_id=trip.trip_id,
+        return TripResponse(id=trip.trip_id,
+                            headsign=trip.trip_headsign,
                             route_id=trip.route_id,
                             service_id=trip.service_id,
-                            trip_headsign=trip.trip_headsign,
                             direction_id=trip.direction_id)
