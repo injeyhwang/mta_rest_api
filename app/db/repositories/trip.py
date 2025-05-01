@@ -10,7 +10,7 @@ class TripRepository:
 
     def get_by_id(self, trip_id: str) -> Trip | None:
         """
-        Get a single trip by ID.
+        Get single trip by ID.
 
         Args:
             trip_id (str): Trip ID to match.

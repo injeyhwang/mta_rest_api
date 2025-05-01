@@ -10,7 +10,7 @@ class RouteRepository:
 
     def get_by_id(self, route_id: str) -> Route | None:
         """
-        Get a single route by ID.
+        Get single route by ID.
 
         Args:
             route_id (str): Route ID to match.
@@ -25,7 +25,7 @@ class RouteRepository:
         Get all routes.
 
         Returns:
-            List[Route]: List of available routes.
+            List[Route]: List of all available routes.
         """
         query = select(Route)
         return self.session.exec(query).all()
