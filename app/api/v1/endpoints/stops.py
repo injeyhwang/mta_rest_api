@@ -34,8 +34,8 @@ def get_stops(offset: int = Query(default=0, ge=0, description="Number of stops 
 @router.get("/{stop_id}",
             response_model=StopDetailedResponse,
             status_code=status.HTTP_200_OK,
-            summary="Get subway stop by ID",
-            description="Retrieve the subway stop by given ID",
+            summary="Get subway stop and stop times by stop ID",
+            description="Retrieve the subway stop details by given stop ID",
             responses={404: {"description": "Stop not found"},
                        500: {"description": "Error retrieving stop"}})
 def get_stop_by_id(stop_id: str = Path(description="The stop ID to search"),
