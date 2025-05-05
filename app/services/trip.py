@@ -24,7 +24,6 @@ class TripService:
                 direction_id: str | None = None,
                 offset: int = 0,
                 limit: int = 100) -> PaginatedResponse[TripResponse]:
-
         trips, total = self.repository.get_all(route_id, service_id, direction_id, offset, limit)
         results = [self._responsify(trip) for trip in trips]
 
