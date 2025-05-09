@@ -55,11 +55,11 @@ def get_stop_by_id(stop_id: str = Path(description="The stop ID to search"),
                     ),
                    service: StopService = Depends(get_stop_service)) -> StopDetailedResponse:
     try:
-        return service.get_detailed_by_id(stop_id,
-                                          route_id,
-                                          service_id.value if service_id is not None else None,
-                                          arrival_time,
-                                          departure_time)
+        return service.get_by_id(stop_id,
+                                 route_id,
+                                 service_id.value if service_id is not None else None,
+                                 arrival_time,
+                                 departure_time)
 
     except QueryInvalidError as e:
         logger.error(f"Invalid time format of arrival_time and/or departure_time: {e}")

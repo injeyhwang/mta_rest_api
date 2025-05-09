@@ -6,7 +6,7 @@ from app.db.repositories.route import RouteRepository
 from app.db.repositories.stop import StopRepository
 from app.db.repositories.stop_time import StopTimeRepository
 from app.exceptions.base import QueryInvalidError, ResourceNotFoundError
-from app.schemas.stop import StopResponse, StopDetailedResponse, StopTimeResponse, StopTimeTrip
+from app.schemas.stop import StopResponse, StopDetailedResponse, StopSchedule, ScheduledTrip
 from app.schemas.trip import ServiceID
 from app.utils.helpers import valid_time_format
 
@@ -18,12 +18,12 @@ class StopService:
         self.stop_repo = StopRepository(session)
         self.stop_time_repo = StopTimeRepository(session)
 
-    def get_detailed_by_id(self,
-                           stop_id: str,
-                           route_id: str | None = None,
-                           service_id: str | None = None,
-                           arrival_time: str | None = None,
-                           departure_time: str | None = None) -> StopResponse:
+    def get_by_id(self,
+                  stop_id: str,
+                  route_id: str | None = None,
+                  service_id: str | None = None,
+                  arrival_time: str | None = None,
+                  departure_time: str | None = None) -> StopResponse:
         stop = self.stop_repo.get_by_id(stop_id)
         if not stop:
             raise ResourceNotFoundError(f"Stop with ID '{stop_id}' not found")
@@ -60,14 +60,14 @@ class StopService:
 
         results = []
         for stop_time, trip in stop_times:
-            trip_res = StopTimeTrip(id=trip.trip_id,
+            trip_res = ScheduledTrip(id=trip.trip_id,
                                     headsign=trip.trip_headsign,
                                     route_id=trip.route_id,
                                     service_id=ServiceID(trip.service_id))
 
-            stop_time_res = StopTimeResponse(trip=trip_res,
-                                             arrival_time=stop_time.arrival_time,
-                                             departure_time=stop_time.departure_time)
+            stop_time_res = StopSchedule(trip=trip_res,
+                                         arrival_time=stop_time.arrival_time,
+                                         departure_time=stop_time.departure_time)
             results.append(stop_time_res)
 
         return StopDetailedResponse(id=stop.stop_id,
