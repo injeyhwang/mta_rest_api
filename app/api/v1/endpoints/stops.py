@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
 from typing import List
 
 from app.dependencies import get_stop_service
-from app.exceptions.base import ResourceNotFoundError, QueryInvalidError
+from app.exceptions.base import QueryInvalidError, ResourceNotFoundError
 from app.schemas.stop import StopDetailedResponse, StopResponse
 from app.schemas.trip import ServiceID
 from app.services.stop import StopService
