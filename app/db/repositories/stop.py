@@ -1,5 +1,5 @@
-from sqlmodel import func, Session, select
-from typing import List, Tuple
+from sqlmodel import Session, select
+from typing import List
 
 from app.db.models import Stop
 
