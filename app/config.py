@@ -12,11 +12,12 @@ class Settings(BaseSettings):
 
     # App info
     app_name: str = "mta_rest_api"
-    app_version: str = "0.11.1"
+    app_version: str = "0.12.0"
     app_description: str = "A simple REST API reverse proxy for MTA's complicated GTFS and GTFS-RT APIs."
 
     # API route prefix
     api_prefix: str = "/api"
+    api_version: str = "v1"
 
     # CORS configuration
     allowed_origins: List[str] = ["http://localhost:3000", "http://localhost:8000"]

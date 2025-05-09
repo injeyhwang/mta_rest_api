@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.router import v1_router
+from app.api.router import router
 from app.utils.logger import logger
 from app.config import settings
 
@@ -22,7 +22,7 @@ def create_server() -> FastAPI:
         allow_headers=["*"],
     )
 
-    app.include_router(v1_router, prefix=settings.api_prefix)
+    app.include_router(router=router)
     logger.info("Starting 🚇 MTA REST API...")
     return app
 
