@@ -1,7 +1,7 @@
 from sqlmodel import Session, select
 from typing import List
 
-from app.db.models import Route
+from app.db.models.route import Route
 
 
 class RouteRepository:

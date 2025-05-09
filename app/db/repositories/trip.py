@@ -1,7 +1,7 @@
 from sqlmodel import func, select, Session
 from typing import List, Tuple
 
-from app.db.models import Trip
+from app.db.models.trip import Trip
 
 
 class TripRepository:

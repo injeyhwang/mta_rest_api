@@ -1,7 +1,7 @@
 from sqlmodel import Session, select
 from typing import List
 
-from app.db.models import Stop
+from app.db.models.stop import Stop
 
 
 class StopRepository:
