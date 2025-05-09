@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Path, status
 from typing import List
 
 from app.dependencies import get_route_service
+from app.exceptions.base import ResourceNotFoundError
 from app.schemas.route import RouteResponse
 from app.services.route import RouteService
 from app.utils.logger import logger
@@ -38,7 +39,7 @@ def get_route_by_id(route_id: str = Path(description="The route ID to search"),
     try:
         return service.get_by_id(route_id)
 
-    except ValueError as e:
+    except ResourceNotFoundError as e:
         logger.error(f"Route with ID '{route_id}' not found: {e}")
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Route not found")
 

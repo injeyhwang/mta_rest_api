@@ -2,6 +2,7 @@ from sqlmodel import Session
 
 from app.db.models import Trip
 from app.db.repositories.trip import TripRepository
+from app.exceptions.base import ResourceNotFoundError
 from app.schemas.pagination import PaginatedResponse
 from app.schemas.trip import TripResponse
 
@@ -14,7 +15,7 @@ class TripService:
     def get_by_id(self, trip_id: str) -> TripResponse:
         trip = self.repository.get_by_id(trip_id)
         if not trip:
-            raise ValueError(f"Trip with ID '{trip_id}' not found")
+            raise ResourceNotFoundError(f"Trip with ID '{trip_id}' not found")
 
         return self._responsify(trip)
 

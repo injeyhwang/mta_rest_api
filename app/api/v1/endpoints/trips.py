@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
 
 from app.dependencies import get_trip_service
+from app.exceptions.base import ResourceNotFoundError
 from app.schemas.pagination import PaginatedResponse
 from app.schemas.trip import DirectionID, ServiceID, TripResponse
 from app.services.trip import TripService
@@ -54,7 +55,7 @@ def get_trip_by_id(trip_id: str = Path(description="The trip ID to search"),
     try:
         return service.get_by_id(trip_id)
 
-    except ValueError as e:
+    except ResourceNotFoundError as e:
         logger.error(f"Trip with ID '{trip_id}' not found: {e}")
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Trip not found")
 

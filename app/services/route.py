@@ -3,6 +3,7 @@ from typing import List
 
 from app.db.repositories.route import RouteRepository
 from app.db.models import Route
+from app.exceptions.base import ResourceNotFoundError
 from app.schemas.route import RouteResponse
 
 
@@ -14,7 +15,7 @@ class RouteService:
     def get_by_id(self, route_id: str) -> RouteResponse:
         route = self.repository.get_by_id(route_id)
         if not route:
-            raise ValueError(f"Route with ID '{route_id}' not found")
+            raise ResourceNotFoundError(f"Route with ID '{route_id}' not found")
 
         return self._responsify(route)
 
