@@ -6,7 +6,7 @@ from app.db.repositories.route import RouteRepository
 from app.db.repositories.stop import StopRepository
 from app.db.repositories.stop_time import StopTimeRepository
 from app.exceptions.base import ResourceNotFoundError, QueryInvalidError
-from app.schemas.stop import StopResponse, StopDetailedResponse, StopTimeResponse, TripResponse
+from app.schemas.stop import StopResponse, StopDetailedResponse, StopTimeResponse, StopTimeTrip
 from app.schemas.trip import ServiceID
 from app.utils.helpers import valid_time_format
 
@@ -60,7 +60,7 @@ class StopService:
 
         results = []
         for stop_time, trip in stop_times:
-            trip_res = TripResponse(id=trip.trip_id,
+            trip_res = StopTimeTrip(id=trip.trip_id,
                                     headsign=trip.trip_headsign,
                                     route_id=trip.route_id,
                                     service_id=ServiceID(trip.service_id))
