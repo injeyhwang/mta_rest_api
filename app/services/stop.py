@@ -5,7 +5,7 @@ from app.db.models import Stop
 from app.db.repositories.route import RouteRepository
 from app.db.repositories.stop import StopRepository
 from app.db.repositories.stop_time import StopTimeRepository
-from app.exceptions.base import ResourceNotFoundError, QueryInvalidError
+from app.exceptions.base import QueryInvalidError, ResourceNotFoundError
 from app.schemas.stop import StopResponse, StopDetailedResponse, StopTimeResponse, StopTimeTrip
 from app.schemas.trip import ServiceID
 from app.utils.helpers import valid_time_format
