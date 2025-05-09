@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
 
 from app.dependencies import get_trip_service
-from app.exceptions.base import ResourceNotFoundError
+from app.exceptions.base import QueryInvalidError, ResourceNotFoundError
 from app.schemas.pagination import PaginatedResponse
-from app.schemas.trip import DirectionID, ServiceID, TripResponse
+from app.schemas.trip import DirectionID, ServiceID, TripResponse, TripDetailedResponse
 from app.services.trip import TripService
 from app.utils.logger import logger
 
@@ -44,16 +44,30 @@ def get_trips(route_id: str | None = Query(default=None,
 
 
 @router.get("/{trip_id}",
-            response_model=TripResponse,
+            response_model=TripDetailedResponse,
             status_code=status.HTTP_200_OK,
-            summary="Get a single subway trip by ID",
-            description="Retrieve subway trip by ID",
-            responses={404: {"description": "Trip not found"},
+            summary="Get subway trip and stop times by trip ID",
+            description="Retrieve the subway trip details by given trip ID",
+            responses={400: {"description": "Time must be in HH:MM:SS format (e.g., 13:22:15)"},
+                       404: {"description": "Trip not found"},
                        500: {"description": "Error retrieving trip"}})
 def get_trip_by_id(trip_id: str = Path(description="The trip ID to search"),
-                   service: TripService = Depends(get_trip_service)) -> TripResponse:
+                   arrival_time: str | None = Query(
+                       default=None,
+                       description="The arrival time to filter this trip's stops by"
+                   ),
+                   departure_time: str | None = Query(
+                       default=None,
+                       description="The departure time to filter this trip's stops by"
+                   ),
+                   service: TripService = Depends(get_trip_service)) -> TripDetailedResponse:
     try:
-        return service.get_by_id(trip_id)
+        return service.get_by_id(trip_id, arrival_time, departure_time)
+
+    except QueryInvalidError as e:
+        logger.error(f"Invalid time format of arrival_time and/or departure_time: {e}")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="Time must be in HH:MM:SS format (e.g., 13:22:15)")
 
     except ResourceNotFoundError as e:
         logger.error(f"Trip with ID '{trip_id}' not found: {e}")
