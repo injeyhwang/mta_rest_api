@@ -20,7 +20,7 @@ class StopRepository:
         """
         return self.session.get(Stop, stop_id)
 
-    def get_all(self, offset: int = 0, limit: int = 100) -> Tuple[List[Stop], int]:
+    def get_all(self) -> List[Stop]:
         """
         Get all subway stops. This method will only return stops and will omit stations.
 
@@ -33,16 +33,7 @@ class StopRepository:
             limit (int): Maximum number of items to return
 
         Returns:
-            Tuple of (stops: List[Stop], total_items: int)
+            List[Stop]: List of subway stops
         """
         query = select(Stop).where(Stop.parent_station != None)
-
-        # get total item count on filtered trips
-        count_query = select(func.count()).select_from(query.subquery())
-        total_items = self.session.exec(count_query).one()
-
-        # apply pagination
-        query = query.offset(offset).limit(limit)
-
-        stops = self.session.exec(query).all()
-        return stops, total_items
+        return self.session.exec(query).all()

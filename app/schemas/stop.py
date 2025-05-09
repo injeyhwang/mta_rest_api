@@ -1,12 +1,18 @@
 from pydantic import BaseModel, Field
 from typing import List
 
-from app.schemas.trip import TripResponse
+from app.schemas.trip import ServiceID
+
+
+class StopTimeTrip(BaseModel):
+    id: str = Field(description="Unique identifier for the trip")
+    headsign: str = Field(description="Text that appears on head signage")
+    route_id: str = Field(description="Route ID the trip takes")
+    service_id: ServiceID = Field(description="Service ID referencing the calendar")
 
 
 class StopTimeResponse(BaseModel):
-    trip: TripResponse = Field(description="Trip that the stop time belongs to")
-    stop_sequence: int = Field(description="Order of stops in the trip")
+    trip: StopTimeTrip = Field(description="Trip that the stop time belongs to")
     arrival_time: str = Field(description="Arrival time at the stop")
     departure_time: str = Field(description="Departure time from the stop")
 
