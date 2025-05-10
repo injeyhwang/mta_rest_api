@@ -11,5 +11,5 @@ class Stop(SQLModel, table=True):
     parent_station: str | None = Field(
         default=None,
         foreign_key="stop.stop_id",
-        description="Stop ID of the parent station. Parent stations contain \
-            stops for both trip directions")
+        description=("Stop ID of the parent station. Parent stations contain "
+                     "stops for both trip directions"))

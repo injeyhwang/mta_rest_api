@@ -36,8 +36,8 @@ def get_stops(
             summary="Get subway stop and stop times by stop ID",
             description="Retrieve the subway stop details by given stop ID",
             responses={
-                400: {"description": "Time must be in HH:MM:SS format \
-                    (e.g., 13:22:15)"},
+                400: {"description": ("Time must be in HH:MM:SS format "
+                                      "(e.g., 13:22:15)")},
                 404: {"description": "Stop not found"},
                 500: {"description": "Error retrieving stop"}})
 def get_stop_by_id(

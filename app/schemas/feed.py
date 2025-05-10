@@ -55,8 +55,8 @@ class VehicleData(BaseModel):
     stop_id: str = Field(description="Current stop ID")
     current_stop_sequence: int | None = Field(
         default=None,
-        description="Current vehicle position on the route stop order \
-            sequence")
+        description=("Current vehicle position on the route stop order "
+                     "sequence"))
     current_status: VehicleStatus | None = Field(
         default=None,
         description="Current status of the vehicle")

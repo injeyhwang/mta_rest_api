@@ -15,9 +15,9 @@ router = APIRouter(prefix="/trips", tags=["trips"])
             response_model=PaginatedResponse[TripResponse],
             status_code=status.HTTP_200_OK,
             summary="Get all paginated subway trips",
-            description="Retrieve all paginated subway trips. Can be further \
-                filtered down by their route_id, service_id, and/or \
-                    direction_id",
+            description=("Retrieve all paginated subway trips. Can be further "
+                         "filtered down by their route_id, service_id, and/or "
+                         "direction_id"),
             responses={500: {"description": "Error retrieving trips"}})
 def get_trips(
         route_id: str | None = Query(
@@ -58,8 +58,8 @@ def get_trips(
             status_code=status.HTTP_200_OK,
             summary="Get subway trip and stop times by trip ID",
             description="Retrieve the subway trip details by given trip ID",
-            responses={400: {"description": "Time must be in HH:MM:SS format \
-                (e.g., 13:22:15)"},
+            responses={400: {"description": ("Time must be in HH:MM:SS format "
+                                             "(e.g., 13:22:15)")},
                        404: {"description": "Trip not found"},
                        500: {"description": "Error retrieving trip"}})
 def get_trip_by_id(

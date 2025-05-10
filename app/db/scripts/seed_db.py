@@ -248,9 +248,8 @@ def seed_stop_times(session: Session):
             if batch_records:
                 _process_stop_times_batch(session, batch_records)
 
-        logger.info(
-            f"Adding a total of {total_records} entries to the stop_times \
-                table")
+        logger.info((f"Adding a total of {total_records} entries to the "
+                     "stop_times table"))
         session.commit()
         logger.info("Successfully committed stop times to database")
     except Exception as e:
