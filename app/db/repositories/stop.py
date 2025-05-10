@@ -21,7 +21,7 @@ class StopRepository:
         """
         return self.session.get(Stop, stop_id)
 
-    def get_all(self) -> List[Stop]:
+    def get_all(self, direction_id: int | None) -> List[Stop]:
         """
         Get all subway stops. This method will only return stops and will omit
         stations.
@@ -31,11 +31,18 @@ class StopRepository:
         E.g. stop_id: 101 has child stops: 101S and 101N
 
         Args:
-            offset (int): Number of items to skip
-            limit (int): Maximum number of items to return
+            direction_id (int | None): Direction to filter by. 1 maps to N,
+                                       0 maps to S
 
         Returns:
             List[Stop]: List of subway stops
         """
         query = select(Stop).where(Stop.parent_station is not None)
+
+        if direction_id is not None:
+            if direction_id == 1:
+                query = query.where(Stop.stop_id.like("%N"))
+            else:
+                query = query.where(Stop.stop_id.like("%S"))
+
         return self.session.exec(query).all()

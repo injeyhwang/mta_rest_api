@@ -44,8 +44,8 @@ class StopService:
                                          arrival_time,
                                          departure_time)
 
-    def get_all(self) -> List[StopSimple]:
-        stops = self.stop_repo.get_all()
+    def get_all(self, direction_id: int | None = None) -> List[StopSimple]:
+        stops = self.stop_repo.get_all(direction_id=direction_id)
         return [self._responsify(stop) for stop in stops]
 
     def _responsify(self, stop: Stop) -> StopSimple:
@@ -54,13 +54,12 @@ class StopService:
                           latitude=stop.stop_lat,
                           longitude=stop.stop_lon)
 
-    def _detailed_responsify(
-            self,
-            stop: Stop,
-            route_id: str | None,
-            service_id: str | None,
-            arrival_time: str | None,
-            departure_time: str | None) -> StopDetailed:
+    def _detailed_responsify(self,
+                             stop: Stop,
+                             route_id: str | None,
+                             service_id: str | None,
+                             arrival_time: str | None,
+                             departure_time: str | None) -> StopDetailed:
         stop_times = self.stop_time_repo.get_all_by_stop_id(
             stop_id=stop.stop_id,
             route_id=route_id,
