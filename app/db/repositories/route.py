@@ -1,5 +1,6 @@
-from sqlmodel import Session, select
 from typing import List
+
+from sqlmodel import Session, select
 
 from app.db.models.route import Route
 

@@ -5,7 +5,8 @@ from app.db.repositories.stop_time import StopTimeRepository
 from app.db.repositories.trip import TripRepository
 from app.exceptions.base import QueryInvalidError, ResourceNotFoundError
 from app.schemas.pagination import PaginatedResponse
-from app.schemas.trip import TripResponse, TripDetailedResponse, TripSchedule, ScheduledStop
+from app.schemas.trip import (ScheduledStop, TripDetailedResponse,
+                              TripResponse, TripSchedule)
 from app.utils.helpers import valid_time_format
 
 
@@ -23,11 +24,15 @@ class TripService:
         if not trip:
             raise ResourceNotFoundError(f"Trip with ID '{trip_id}' not found")
 
-        if arrival_time is not None and not valid_time_format(arrival_time):
-            raise QueryInvalidError(f"arrival_time must be in HH:MM:SS format (e.g., 13:22:15)")
+        if (arrival_time is not None
+                and not valid_time_format(arrival_time)):
+            raise QueryInvalidError(
+                "arrival_time must be in HH:MM:SS format (e.g., 13:22:15)")
 
-        if departure_time is not None and not valid_time_format(departure_time):
-            raise QueryInvalidError(f"departure_time must be in HH:MM:SS format (e.g., 13:22:15)")
+        if (departure_time is not None
+                and not valid_time_format(departure_time)):
+            raise QueryInvalidError(
+                "departure_time must be in HH:MM:SS format (e.g., 13:22:15)")
 
         return self._detailed_responsify(trip, arrival_time, departure_time)
 
@@ -37,10 +42,14 @@ class TripService:
                 direction_id: str | None = None,
                 offset: int = 0,
                 limit: int = 100) -> PaginatedResponse[TripResponse]:
-        trips, total = self.trip_repo.get_all(route_id, service_id, direction_id, offset, limit)
+        trips, total = self.trip_repo.get_all(
+            route_id, service_id, direction_id, offset, limit)
         results = [self._responsify(trip) for trip in trips]
 
-        return PaginatedResponse[TripResponse](total=total, offset=offset, limit=limit, results=results)
+        return PaginatedResponse[TripResponse](total=total,
+                                               offset=offset,
+                                               limit=limit,
+                                               results=results)
 
     def _responsify(self, trip: Trip) -> TripResponse:
         return TripResponse(id=trip.trip_id,
@@ -49,25 +58,28 @@ class TripService:
                             service_id=trip.service_id,
                             direction_id=trip.direction_id)
 
-    def _detailed_responsify(self,
-                             trip: Trip,
-                             arrival_time: str | None,
-                             departure_time: str | None) -> TripDetailedResponse:
-        stop_times = self.stop_time_repo.get_all_by_trip_id(trip_id=trip.trip_id,
-                                                            arrival_time=arrival_time,
-                                                            departure_time=departure_time)
+    def _detailed_responsify(
+            self,
+            trip: Trip,
+            arrival_time: str | None,
+            departure_time: str | None) -> TripDetailedResponse:
+        stop_times = self.stop_time_repo.get_all_by_trip_id(
+            trip_id=trip.trip_id,
+            arrival_time=arrival_time,
+            departure_time=departure_time)
 
         results = []
         for stop_time, stop in stop_times:
             stop_res = ScheduledStop(id=stop.stop_id,
-                                name=stop.stop_name,
-                                latitude=stop.stop_lat,
-                                longitude=stop.stop_lon)
+                                     name=stop.stop_name,
+                                     latitude=stop.stop_lat,
+                                     longitude=stop.stop_lon)
 
-            stop_time_res = TripSchedule(stop=stop_res,
-                                         stop_sequence=stop_time.stop_sequence,
-                                         arrival_time=stop_time.arrival_time,
-                                         departure_time=stop_time.departure_time)
+            stop_time_res = TripSchedule(
+                stop=stop_res,
+                stop_sequence=stop_time.stop_sequence,
+                arrival_time=stop_time.arrival_time,
+                departure_time=stop_time.departure_time)
             results.append(stop_time_res)
 
         return TripDetailedResponse(id=trip.trip_id,

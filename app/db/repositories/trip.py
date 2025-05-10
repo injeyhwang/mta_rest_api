@@ -1,5 +1,6 @@
-from sqlmodel import func, select, Session
 from typing import List, Tuple
+
+from sqlmodel import Session, func, select
 
 from app.db.models.trip import Trip
 

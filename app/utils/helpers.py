@@ -11,7 +11,8 @@ def valid_time_format(time_str: str) -> bool:
     Returns:
         (bool): True if match, False otherwise.
     """
-    time_pattern = re.compile(r'^([0-1][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$')
+    time_pattern = re.compile(
+        r'^([0-1][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$')
     if not time_pattern.match(time_str):
         return False
 

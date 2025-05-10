@@ -1,15 +1,17 @@
-# SQLModel is imported from app.db.database because Python executes all the code creating the classes
-# inheriting from SQLModel and registering them in the SQLModel.metadata.
+# SQLModel is imported from app.db.database because Python executes all the
+# code creating the classes inheriting from SQLModel and registering them in
+# the SQLModel.metadata.
 #
 # https://sqlmodel.tiangolo.com/tutorial/create-db-and-table/#sqlmodel-metadata-order-matters
 
-from app.db.database import get_db_engine, SQLModel
+from app.db.database import SQLModel, get_db_engine
 from app.utils.logger import logger
 
 
 def create_db_tables(engine):
     """
-    Create all database tables defined in SQLModel metadata if they don't exist.
+    Create all database tables defined in SQLModel metadata if they don't
+    exist.
     """
     logger.info("Creating database tables if they don't exist")
     SQLModel.metadata.create_all(engine)

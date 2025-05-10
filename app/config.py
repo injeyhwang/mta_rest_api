@@ -1,26 +1,31 @@
 from typing import List
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     """
-    FastAPI project configurations via pydantic-settings. All server configs and metadata info are
-    defined here as well as environment variables to be used in the entire codebase.
+    FastAPI project configurations via pydantic-settings. All server configs
+    and metadata info are defined here as well as environment variables to be
+    used in the entire codebase.
     """
     # Dotenv support
-    model_config = SettingsConfigDict(env_file='.env', env_file_encoding='utf-8')
+    model_config = SettingsConfigDict(
+        env_file='.env', env_file_encoding='utf-8')
 
     # App info
     app_name: str = "mta_rest_api"
     app_version: str = "0.12.0"
-    app_description: str = "A simple REST API reverse proxy for MTA's complicated GTFS and GTFS-RT APIs."
+    app_description: str = "A simple REST API reverse proxy for MTA's \
+        complicated GTFS and GTFS-RT APIs."
 
     # API route prefix
     api_prefix: str = "/api"
     api_version: str = "v1"
 
     # CORS configuration
-    allowed_origins: List[str] = ["http://localhost:3000", "http://localhost:8000"]
+    allowed_origins: List[str] = [
+        "http://localhost:3000", "http://localhost:8000"]
 
     # Debug mode
     debug: bool = True

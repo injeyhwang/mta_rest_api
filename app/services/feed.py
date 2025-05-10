@@ -1,27 +1,25 @@
+import json
+from pathlib import Path
+from typing import Dict, Tuple
+
+import requests
 from fastapi import status
 from google.protobuf.json_format import MessageToDict
 from google.transit import gtfs_realtime_pb2
-import json
-from pathlib import Path
-import requests
-from typing import Dict, Tuple
 
 from app.config import settings
-from app.exceptions.feed import (
-    FeedServiceError,
-    FeedEndpointNotFoundError,
-    FeedFetchError,
-    FeedTimeoutError,
-    FeedProcessingError
-)
+from app.exceptions.feed import (FeedEndpointNotFoundError, FeedFetchError,
+                                 FeedProcessingError, FeedServiceError,
+                                 FeedTimeoutError)
 from app.schemas.feed import FeedResponse
 from app.utils.logger import logger
 
 
 class FeedService:
     """
-    FeedService object that loads GTFS-RT feed endpoints from mta_feed_urls.json and provides methods
-    to to interact with MTA's GTFS-RT API.
+    FeedService object that loads GTFS-RT feed endpoints from
+    mta_feed_urls.json and provides methods to to interact with MTA's GTFS-RT
+    API.
 
     Check https://api.mta.info/#/ for real time data feeds developer resources.
     """
@@ -48,7 +46,8 @@ class FeedService:
         mta_endpoint: str = self._get_endpoint_url(feed=feed)
         if not mta_endpoint:
             logger.error(f"No endpoint configuration found for feed: '{feed}'")
-            raise FeedEndpointNotFoundError(f"No endpoint configuration found for feed: '{feed}'")
+            raise FeedEndpointNotFoundError(
+                f"No endpoint configuration found for feed: '{feed}'")
 
         logger.info(f"Fetching GTFS-RT feed from endpoint: '{mta_endpoint}'")
         feed_message = gtfs_realtime_pb2.FeedMessage()
@@ -56,13 +55,15 @@ class FeedService:
         try:
             res = requests.get(mta_endpoint, timeout=10)
             if res.status_code != status.HTTP_200_OK:
-                logger.error(f"Error fetching GTFS-RT feed. Status code: {res.status_code}")
-                raise FeedFetchError(f"Error fetching GTFS-RT feed: HTTP {res.status_code}")
+                err_msg = f"[{res.status_code}]: Error fetching GTFS-RT feed"
+                logger.error(err_msg)
+                raise FeedFetchError(err_msg)
 
             logger.info("Parsing GTFS-RT feed")
             feed_message.ParseFromString(res.content)
             logger.info("Converting protobuf message to dictionary")
-            feed_dict = MessageToDict(feed_message, preserving_proto_field_name=True)
+            feed_dict = MessageToDict(
+                feed_message, preserving_proto_field_name=True)
             logger.info("Successfully processed GTFS-RT feed")
             return FeedResponse(**feed_dict)
 
@@ -77,9 +78,13 @@ class FeedService:
             logger.exception(f"Error processing GTFS-RT feed: {e}")
             raise FeedProcessingError(f"Error processing GTFS-RT feed: {e}")
 
-    def get_paginated_feed(self, feed: str, offset: int, limit: int) -> Tuple[FeedResponse, int]:
+    def get_paginated_feed(self,
+                           feed: str,
+                           offset: int,
+                           limit: int) -> Tuple[FeedResponse, int]:
         """
-        Get paginated real-time data from MTA's GTFS-RT API for the specified feed.
+        Get paginated real-time data from MTA's GTFS-RT API for the specified
+        feed.
 
         Args:
             feed (str): Feed identifier
@@ -92,7 +97,8 @@ class FeedService:
         feed_data = self.get_feed(feed)
         total_items = len(feed_data.entity)
 
-        # must handle pagination in-memory because MTA API doesn't offer this feature 😭
+        # must handle pagination in-memory because MTA API doesn't offer this
+        # feature 😭
         feed_data.entity = feed_data.entity[offset:offset + limit]
 
         return feed_data, total_items
@@ -101,7 +107,8 @@ class FeedService:
         """
         Load MTA feed endpoint URLs from 'mta_feed_urls.json' file.
 
-        This is an internal method and is not to be used outside of FeedService.
+        This is an internal method and is not to be used outside of
+        FeedService.
 
         Returns:
             Dict[str, str]: Feed to API Endpoint key-value pairs.
@@ -114,7 +121,8 @@ class FeedService:
         """
         Get the endpoint URL for a specific MTA GTFS-RT feed.
 
-        This is an internal method and is not to be used outside of FeedService.
+        This is an internal method and is not to be used outside of
+        FeedService.
 
         Args:
             feed (str): The feed to get the URL for.

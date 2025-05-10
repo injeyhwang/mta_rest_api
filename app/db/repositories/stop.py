@@ -1,5 +1,6 @@
-from sqlmodel import Session, select
 from typing import List
+
+from sqlmodel import Session, select
 
 from app.db.models.stop import Stop
 
@@ -22,7 +23,8 @@ class StopRepository:
 
     def get_all(self) -> List[Stop]:
         """
-        Get all subway stops. This method will only return stops and will omit stations.
+        Get all subway stops. This method will only return stops and will omit
+        stations.
 
         Stations are stops that contain multiple stops with directions.
 
@@ -35,5 +37,5 @@ class StopRepository:
         Returns:
             List[Stop]: List of subway stops
         """
-        query = select(Stop).where(Stop.parent_station != None)
+        query = select(Stop).where(Stop.parent_station is not None)
         return self.session.exec(query).all()

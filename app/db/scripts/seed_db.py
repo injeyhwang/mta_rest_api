@@ -1,17 +1,20 @@
-# SQLModel is imported from app.db.database because Python executes all the code creating the classes
-# inheriting from SQLModel and registering them in the SQLModel.metadata.
+# SQLModel is imported from app.db.database because Python executes all the
+# code creating the classes inheriting from SQLModel and registering them in
+# the SQLModel.metadata.
 #
 # https://sqlmodel.tiangolo.com/tutorial/create-db-and-table/#sqlmodel-metadata-order-matters
 
 import csv
-from datetime import datetime
 import os
-from sqlmodel import select, Session
+from datetime import datetime
 from typing import Any, Dict, List
 
+from sqlmodel import Session, select
+
 from app.config import settings
-from app.db.database import get_db_engine, SQLModel
-from app.db.models import Calendar, Route, Stop, Shape, StopTime, Transfer, Trip
+from app.db.database import SQLModel, get_db_engine
+from app.db.models import (Calendar, Route, Shape, Stop, StopTime, Transfer,
+                           Trip)
 from app.db.scripts.init_db import create_db_tables
 from app.utils.logger import logger
 
@@ -25,13 +28,14 @@ def read_csv_file(file_path: str) -> List[Dict[str, Any]]:
         reader.fieldnames = [name.lower() for name in reader.fieldnames]
 
         for row in reader:
-            records.append({ key: value for (key, value) in row.items() })
+            records.append({key: value for (key, value) in row.items()})
 
     logger.info(f"Successfully read {len(records)} records from '{file_path}'")
     return records
 
 
-def convert_field_types(data: List[Dict[str, Any]], model_class: SQLModel) -> List[Dict[str, Any]]:
+def convert_field_types(data: List[Dict[str, Any]],
+                        model_class: SQLModel) -> List[Dict[str, Any]]:
     converted_data = []
     for record in data:
         converted_record = {}
@@ -51,17 +55,22 @@ def convert_field_types(data: List[Dict[str, Any]], model_class: SQLModel) -> Li
                     try:
                         converted_record[field] = float(value)
                     except ValueError:
-                        logger.exception(f"Could not convert '{value}' to float for field '{field}'")
+                        logger.exception(
+                            f"Could not convert '{value}' to float for field '{
+                                field}'")
                 elif field_type == int:
                     try:
                         converted_record[field] = int(value)
                     except ValueError:
-                        logger.exception(f"Could not convert '{value}' to int for field '{field}'")
+                        logger.exception(
+                            f"Could not convert '{value}' to int for field '{
+                                field}'")
                 else:
                     # keep as string for other data types
                     converted_record[field] = value
             else:
-                # field is not defined in model and so can't convert - keep it as is
+                # field is not defined in model and so can't convert,
+                # keep it as is
                 converted_record[field] = value
 
         converted_data.append(converted_record)
@@ -73,7 +82,8 @@ def seed_routes(session: Session):
     try:
         routes_file_path = os.path.join(settings.gtfs_dir_path, "routes.txt")
         if not os.path.exists(routes_file_path):
-            raise FileNotFoundError(f"Routes file not found at: '{routes_file_path}'")
+            raise FileNotFoundError(
+                f"Routes file not found at: '{routes_file_path}'")
 
         routes_data = read_csv_file(routes_file_path)
         routes_data = convert_field_types(routes_data, Route)
@@ -96,12 +106,14 @@ def seed_stops(session: Session):
     try:
         stops_file_path = os.path.join(settings.gtfs_dir_path, "stops.txt")
         if not os.path.exists(stops_file_path):
-            raise FileNotFoundError(f"Stops file not found at: '{stops_file_path}'")
+            raise FileNotFoundError(
+                f"Stops file not found at: '{stops_file_path}'")
 
         stops_data = read_csv_file(stops_file_path)
         stops_data = convert_field_types(stops_data, Stop)
 
-        # first pass: add all stops without parent_station to avoid foreign key constraints
+        # first pass: add all stops without parent_station to avoid foreign
+        # key constraints
         for stop_dict in stops_data:
             if stop_dict.get('parent_station') is None:
                 stop = Stop(**stop_dict)
@@ -110,7 +122,8 @@ def seed_stops(session: Session):
         # second pass: add stops with parent_station
         for stop_dict in stops_data:
             if stop_dict.get('parent_station') is not None:
-                statement = select(Stop).where(Stop.stop_id == stop_dict['stop_id'])
+                statement = select(Stop).where(
+                    Stop.stop_id == stop_dict['stop_id'])
                 existing_stop = session.exec(statement).first()
                 if not existing_stop:
                     stop = Stop(**stop_dict)
@@ -128,9 +141,11 @@ def seed_stops(session: Session):
 
 def seed_calendar(session: Session):
     try:
-        calendar_file_path = os.path.join(settings.gtfs_dir_path, "calendar.txt")
+        calendar_file_path = os.path.join(
+            settings.gtfs_dir_path, "calendar.txt")
         if not os.path.exists(calendar_file_path):
-            raise FileNotFoundError(f"Calendar file not found at: '{calendar_file_path}'")
+            raise FileNotFoundError(
+                f"Calendar file not found at: '{calendar_file_path}'")
 
         calendar_data = read_csv_file(calendar_file_path)
         calendar_data = convert_field_types(calendar_data, Calendar)
@@ -139,7 +154,8 @@ def seed_calendar(session: Session):
             calendar = Calendar(**calendar_dict)
             session.add(calendar)
 
-        logger.info(f"Adding {len(calendar_data)} entries to the calendar table")
+        logger.info(
+            f"Adding {len(calendar_data)} entries to the calendar table")
         session.commit()
         logger.info("Successfully committed calendar entries to database")
     except Exception as e:
@@ -153,7 +169,8 @@ def seed_shapes(session: Session):
     try:
         shapes_file_path = os.path.join(settings.gtfs_dir_path, "shapes.txt")
         if not os.path.exists(shapes_file_path):
-            raise FileNotFoundError(f"Shapes file not found: {shapes_file_path}")
+            raise FileNotFoundError(
+                f"Shapes file not found: {shapes_file_path}")
 
         shapes_data = read_csv_file(shapes_file_path)
         shapes_data = convert_field_types(shapes_data, Shape)
@@ -176,7 +193,8 @@ def seed_trips(session: Session):
     try:
         trips_file_path = os.path.join(settings.gtfs_dir_path, "trips.txt")
         if not os.path.exists(trips_file_path):
-            raise FileNotFoundError(f"Trips file not found: '{trips_file_path}'")
+            raise FileNotFoundError(
+                f"Trips file not found: '{trips_file_path}'")
 
         trips_data = read_csv_file(trips_file_path)
         trips_data = convert_field_types(trips_data, Trip)
@@ -197,11 +215,14 @@ def seed_trips(session: Session):
 
 def seed_stop_times(session: Session):
     try:
-        stop_times_file_path = os.path.join(settings.gtfs_dir_path, "stop_times.txt")
+        stop_times_file_path = os.path.join(
+            settings.gtfs_dir_path, "stop_times.txt")
         if not os.path.exists(stop_times_file_path):
-            raise FileNotFoundError(f"Stop times file not found: '{stop_times_file_path}'")
+            raise FileNotFoundError(
+                f"Stop times file not found: '{stop_times_file_path}'")
 
-        def _process_stop_times_batch(session: Session, batch_records: List[Dict[str, Any]]):
+        def _process_stop_times_batch(session: Session,
+                                      batch_records: List[Dict[str, Any]]):
             stop_times_data = convert_field_types(batch_records, StopTime)
             for stop_time_dict in stop_times_data:
                 stop_time = StopTime(**stop_time_dict)
@@ -227,7 +248,9 @@ def seed_stop_times(session: Session):
             if batch_records:
                 _process_stop_times_batch(session, batch_records)
 
-        logger.info(f"Adding a total of {total_records} entries to the stop_times table")
+        logger.info(
+            f"Adding a total of {total_records} entries to the stop_times \
+                table")
         session.commit()
         logger.info("Successfully committed stop times to database")
     except Exception as e:
@@ -239,9 +262,11 @@ def seed_stop_times(session: Session):
 
 def seed_transfers(session: Session):
     try:
-        transfers_file_path = os.path.join(settings.gtfs_dir_path, "transfers.txt")
+        transfers_file_path = os.path.join(
+            settings.gtfs_dir_path, "transfers.txt")
         if not os.path.exists(transfers_file_path):
-            raise FileNotFoundError(f"Transfers file not found: '{transfers_file_path}'")
+            raise FileNotFoundError(
+                f"Transfers file not found: '{transfers_file_path}'")
 
         transfers_data = read_csv_file(transfers_file_path)
         transfers_data = convert_field_types(transfers_data, Transfer)
@@ -250,7 +275,8 @@ def seed_transfers(session: Session):
             transfer = Transfer(**transfer_dict)
             session.add(transfer)
 
-        logger.info(f"Adding {len(transfers_data)} entries to the transfer table")
+        logger.info(
+            f"Adding {len(transfers_data)} entries to the transfer table")
         session.commit()
         logger.info("Successfully committed transfers to database")
     except Exception as e:
@@ -268,11 +294,13 @@ def seed_database():
     logger.info(f"Starting GTFS data seeding at {start_time}")
 
     if not os.path.exists(settings.gtfs_dir_path):
-        logger.error(f"GTFS directory not found at: '{settings.gtfs_dir_path}'")
+        logger.error(
+            f"GTFS directory not found at: '{settings.gtfs_dir_path}'")
         return
 
     try:
-        # Initialize database and tables if they don't exist; get engine to perform database seeding
+        # Initialize database and tables if they don't exist; get engine to
+        # perform database seeding
         engine = get_db_engine()
         create_db_tables(engine)
 
@@ -288,7 +316,8 @@ def seed_database():
 
             end_time = datetime.now()
             duration = end_time - start_time
-            logger.info(f"Database seeding completed successfully in {duration}")
+            logger.info(
+                f"Database seeding completed successfully in {duration}")
     finally:
         if engine:
             logger.info("Disposing database engine")
