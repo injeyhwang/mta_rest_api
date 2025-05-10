@@ -3,7 +3,6 @@ from typing import List
 from sqlmodel import Session
 
 from app.db.models import Stop
-from app.db.repositories.route import RouteRepository
 from app.db.repositories.stop import StopRepository
 from app.db.repositories.stop_time import StopTimeRepository
 from app.exceptions.base import QueryInvalidError, ResourceNotFoundError
@@ -16,7 +15,6 @@ from app.utils.helpers import valid_time_format
 class StopService:
     def __init__(self, session: Session):
         self.session = session
-        self.route_repo = RouteRepository(session)
         self.stop_repo = StopRepository(session)
         self.stop_time_repo = StopTimeRepository(session)
 
