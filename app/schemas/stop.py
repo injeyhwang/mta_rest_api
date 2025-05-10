@@ -20,14 +20,14 @@ class StopSchedule(BaseModel):
     departure_time: str = Field(description="Departure time from the stop")
 
 
-class StopResponse(BaseModel):
+class StopSimple(BaseModel):
     id: str = Field(description="Unique identifier for the stop")
     name: str = Field(description="Name of the stop")
     latitude: float = Field(description="Latitude value of the stop")
     longitude: float = Field(description="Longitude value of the stop")
 
 
-class StopDetailedResponse(BaseModel):
+class StopDetailed(BaseModel):
     id: str = Field(description="Unique identifier for the stop")
     name: str = Field(description="Name of the stop")
     latitude: float = Field(description="Latitude value of the stop")

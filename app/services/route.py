@@ -5,7 +5,7 @@ from sqlmodel import Session
 from app.db.models import Route
 from app.db.repositories.route import RouteRepository
 from app.exceptions.base import ResourceNotFoundError
-from app.schemas.route import RouteResponse
+from app.schemas.route import RouteDetailed
 
 
 class RouteService:
@@ -13,7 +13,7 @@ class RouteService:
         self.session = session
         self.repository = RouteRepository(session)
 
-    def get_by_id(self, route_id: str) -> RouteResponse:
+    def get_by_id(self, route_id: str) -> RouteDetailed:
         route = self.repository.get_by_id(route_id)
         if not route:
             raise ResourceNotFoundError(
@@ -21,13 +21,13 @@ class RouteService:
 
         return self._responsify(route)
 
-    def get_all(self) -> List[RouteResponse]:
+    def get_all(self) -> List[RouteDetailed]:
         routes = self.repository.get_all()
         results = [self._responsify(route) for route in routes]
         return results
 
-    def _responsify(self, route: Route) -> RouteResponse:
-        return RouteResponse(id=route.route_id,
+    def _responsify(self, route: Route) -> RouteDetailed:
+        return RouteDetailed(id=route.route_id,
                              short_name=route.route_short_name,
                              long_name=route.route_long_name,
                              description=route.route_desc,

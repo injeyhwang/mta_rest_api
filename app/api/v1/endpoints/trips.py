@@ -2,9 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
 
 from app.dependencies import get_trip_service
 from app.exceptions.base import QueryInvalidError, ResourceNotFoundError
-from app.schemas.pagination import PaginatedResponse
-from app.schemas.trip import (DirectionID, ServiceID, TripDetailedResponse,
-                              TripResponse)
+from app.schemas.pagination import Paginated
+from app.schemas.trip import DirectionID, ServiceID, TripDetailed, TripSimple
 from app.services.trip import TripService
 from app.utils.logger import logger
 
@@ -12,7 +11,7 @@ router = APIRouter(prefix="/trips", tags=["trips"])
 
 
 @router.get("/",
-            response_model=PaginatedResponse[TripResponse],
+            response_model=Paginated[TripSimple],
             status_code=status.HTTP_200_OK,
             summary="Get all paginated subway trips",
             description=("Retrieve all paginated subway trips. Can be further "
@@ -39,7 +38,7 @@ def get_trips(
             le=1000,
             description="Maximum number of trips to return"),
         service: TripService = Depends(get_trip_service)
-) -> PaginatedResponse[TripResponse]:
+) -> Paginated[TripSimple]:
     try:
         return service.get_all(route_id,
                                service_id.value if service_id else None,
@@ -54,24 +53,24 @@ def get_trips(
 
 
 @router.get("/{trip_id}",
-            response_model=TripDetailedResponse,
+            response_model=TripDetailed,
             status_code=status.HTTP_200_OK,
             summary="Get subway trip and stop times by trip ID",
             description="Retrieve the subway trip details by given trip ID",
-            responses={400: {"description": ("Time must be in HH:MM:SS format "
-                                             "(e.g., 13:22:15)")},
-                       404: {"description": "Trip not found"},
-                       500: {"description": "Error retrieving trip"}})
+            responses={
+                400: {"description": ("Time must be in HH:MM:SS format "
+                                      "(e.g., 13:22:15)")},
+                404: {"description": "Trip not found"},
+                500: {"description": "Error retrieving trip"}})
 def get_trip_by_id(
-    trip_id: str = Path(description="The trip ID to search"),
-    arrival_time: str | None = Query(
-        default=None,
-        description="The arrival time to filter this trip's stops by"),
-    departure_time: str | None = Query(
-        default=None,
-        description="The departure time to filter this trip's stops by"),
-        service: TripService = Depends(get_trip_service)
-) -> TripDetailedResponse:
+        trip_id: str = Path(description="The trip ID to search"),
+        arrival_time: str | None = Query(
+            default=None,
+            description="The arrival time to filter this trip's stops by"),
+        departure_time: str | None = Query(
+            default=None,
+            description="The departure time to filter this trip's stops by"),
+        service: TripService = Depends(get_trip_service)) -> TripDetailed:
     try:
         return service.get_by_id(trip_id, arrival_time, departure_time)
 

@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
 
 from app.dependencies import get_stop_service
 from app.exceptions.base import QueryInvalidError, ResourceNotFoundError
-from app.schemas.stop import StopDetailedResponse, StopResponse
+from app.schemas.stop import StopDetailed, StopSimple
 from app.schemas.trip import ServiceID
 from app.services.stop import StopService
 from app.utils.logger import logger
@@ -13,14 +13,13 @@ router = APIRouter(prefix="/stops", tags=["stops"])
 
 
 @router.get("/",
-            response_model=List[StopResponse],
+            response_model=List[StopSimple],
             status_code=status.HTTP_200_OK,
             summary="Get all subway stops",
             description="Retrieve all subway stops",
             responses={500: {"description": "Error retrieving stops"}})
 def get_stops(
-        service: StopService = Depends(get_stop_service)
-) -> List[StopResponse]:
+        service: StopService = Depends(get_stop_service)) -> List[StopSimple]:
     try:
         return service.get_all()
 
@@ -31,7 +30,7 @@ def get_stops(
 
 
 @router.get("/{stop_id}",
-            response_model=StopDetailedResponse,
+            response_model=StopDetailed,
             status_code=status.HTTP_200_OK,
             summary="Get subway stop and stop times by stop ID",
             description="Retrieve the subway stop details by given stop ID",
@@ -54,8 +53,7 @@ def get_stop_by_id(
         departure_time: str | None = Query(
             default=None,
             description="The departure time to filter this stop's trips by"),
-        service: StopService = Depends(get_stop_service)
-) -> StopDetailedResponse:
+        service: StopService = Depends(get_stop_service)) -> StopDetailed:
     try:
         return service.get_by_id(stop_id,
                                  route_id,

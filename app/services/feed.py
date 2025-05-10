@@ -11,7 +11,7 @@ from app.config import settings
 from app.exceptions.feed import (FeedEndpointNotFoundError, FeedFetchError,
                                  FeedProcessingError, FeedServiceError,
                                  FeedTimeoutError)
-from app.schemas.feed import FeedResponse
+from app.schemas.feed import FeedDetailed
 from app.utils.logger import logger
 
 
@@ -27,7 +27,7 @@ class FeedService:
     def __init__(self):
         self.mta_endpoints = self._load_endpoint_urls()
 
-    def get_feed(self, feed: str) -> FeedResponse:
+    def get_feed(self, feed: str) -> FeedDetailed:
         """
         Get real-time data from MTA's GTFS-RT API for the specified feed.
 
@@ -41,7 +41,7 @@ class FeedService:
             FeedProcessingError: Error processing the feed data
 
         Returns:
-            FeedResponse: Parsed GTFS-RT message for a specific feed.
+            FeedDetailed: Parsed GTFS-RT message for a specific feed.
         """
         mta_endpoint: str = self._get_endpoint_url(feed=feed)
         if not mta_endpoint:
@@ -65,7 +65,7 @@ class FeedService:
             feed_dict = MessageToDict(
                 feed_message, preserving_proto_field_name=True)
             logger.info("Successfully processed GTFS-RT feed")
-            return FeedResponse(**feed_dict)
+            return FeedDetailed(**feed_dict)
 
         except requests.exceptions.Timeout:
             logger.error("Timeout while fetching GTFS-RT feed")
@@ -81,7 +81,7 @@ class FeedService:
     def get_paginated_feed(self,
                            feed: str,
                            offset: int,
-                           limit: int) -> Tuple[FeedResponse, int]:
+                           limit: int) -> Tuple[FeedDetailed, int]:
         """
         Get paginated real-time data from MTA's GTFS-RT API for the specified
         feed.
@@ -92,7 +92,7 @@ class FeedService:
             limit (int): Maximum number of items to return
 
         Returns:
-            Tuple[FeedResponse, int]: Tuple of FeedResponse and total_items
+            Tuple[FeedDetailed, int]: Tuple of FeedDetailed and total_items
         """
         feed_data = self.get_feed(feed)
         total_items = len(feed_data.entity)

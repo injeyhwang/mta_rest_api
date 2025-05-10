@@ -7,8 +7,8 @@ from app.db.repositories.route import RouteRepository
 from app.db.repositories.stop import StopRepository
 from app.db.repositories.stop_time import StopTimeRepository
 from app.exceptions.base import QueryInvalidError, ResourceNotFoundError
-from app.schemas.stop import (ScheduledTrip, StopDetailedResponse,
-                              StopResponse, StopSchedule)
+from app.schemas.stop import (ScheduledTrip, StopDetailed, StopSchedule,
+                              StopSimple)
 from app.schemas.trip import ServiceID
 from app.utils.helpers import valid_time_format
 
@@ -25,7 +25,7 @@ class StopService:
                   route_id: str | None = None,
                   service_id: str | None = None,
                   arrival_time: str | None = None,
-                  departure_time: str | None = None) -> StopResponse:
+                  departure_time: str | None = None) -> StopSimple:
         stop = self.stop_repo.get_by_id(stop_id)
         if not stop:
             raise ResourceNotFoundError(f"Stop with ID '{stop_id}' not found")
@@ -46,15 +46,15 @@ class StopService:
                                          arrival_time,
                                          departure_time)
 
-    def get_all(self) -> List[StopResponse]:
+    def get_all(self) -> List[StopSimple]:
         stops = self.stop_repo.get_all()
         return [self._responsify(stop) for stop in stops]
 
-    def _responsify(self, stop: Stop) -> StopResponse:
-        return StopResponse(id=stop.stop_id,
-                            name=stop.stop_name,
-                            latitude=stop.stop_lat,
-                            longitude=stop.stop_lon)
+    def _responsify(self, stop: Stop) -> StopSimple:
+        return StopSimple(id=stop.stop_id,
+                          name=stop.stop_name,
+                          latitude=stop.stop_lat,
+                          longitude=stop.stop_lon)
 
     def _detailed_responsify(
             self,
@@ -62,7 +62,7 @@ class StopService:
             route_id: str | None,
             service_id: str | None,
             arrival_time: str | None,
-            departure_time: str | None) -> StopDetailedResponse:
+            departure_time: str | None) -> StopDetailed:
         stop_times = self.stop_time_repo.get_all_by_stop_id(
             stop_id=stop.stop_id,
             route_id=route_id,
@@ -83,8 +83,8 @@ class StopService:
                 departure_time=stop_time.departure_time)
             results.append(stop_time_res)
 
-        return StopDetailedResponse(id=stop.stop_id,
-                                    name=stop.stop_name,
-                                    latitude=stop.stop_lat,
-                                    longitude=stop.stop_lon,
-                                    stop_times=results)
+        return StopDetailed(id=stop.stop_id,
+                            name=stop.stop_name,
+                            latitude=stop.stop_lat,
+                            longitude=stop.stop_lon,
+                            stop_times=results)

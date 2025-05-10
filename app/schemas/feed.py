@@ -84,6 +84,6 @@ class FeedHeader(BaseModel):
     timestamp: str = Field(description="Unix timestamp of the request")
 
 
-class FeedResponse(BaseModel):
+class FeedDetailed(BaseModel):
     header: FeedHeader = Field(description="GTFS-RT header metadata")
     entity: List[Entity] = Field(description="List of feed entities")
