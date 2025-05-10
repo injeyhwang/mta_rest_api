@@ -27,7 +27,9 @@ def get_trips(
             description="The service ID to filter by"),
         direction_id: DirectionID | None = Query(
             default=None,
-            description="The direction ID to filter by"),
+            description=("The direction ID to filter stops by. 1 is inbound "
+                         "trains or North bound. 0 is outbound trains or "
+                         "South bound.")),
         offset: int = Query(
             default=0,
             ge=0,
@@ -42,7 +44,7 @@ def get_trips(
     try:
         return service.get_all(route_id,
                                service_id.value if service_id else None,
-                               direction_id,
+                               direction_id.value if direction_id else None,
                                offset,
                                limit)
 
@@ -55,8 +57,9 @@ def get_trips(
 @router.get("/{trip_id}",
             response_model=TripDetailed,
             status_code=status.HTTP_200_OK,
-            summary="Get subway trip and stop times by trip ID",
-            description="Retrieve the subway trip details by given trip ID",
+            summary="Get detailed subway trip information",
+            description=("Retrieve detailed subway trip information by given "
+                         "trip ID"),
             responses={
                 400: {"description": ("Time must be in HH:MM:SS format "
                                       "(e.g., 13:22:15)")},
