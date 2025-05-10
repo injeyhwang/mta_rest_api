@@ -5,6 +5,10 @@ from pydantic import BaseModel, Field
 
 
 class DirectionID(int, Enum):
+    """
+    1 is mapped to stop_ids ending with N.
+    0 is mapped to stop_ids ending with S.
+    """
     INBOUND = 1
     OUTBOUND = 0
 
