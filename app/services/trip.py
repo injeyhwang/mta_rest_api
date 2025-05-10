@@ -39,11 +39,14 @@ class TripService:
     def get_all(self,
                 route_id: str | None = None,
                 service_id: str | None = None,
-                direction_id: str | None = None,
+                direction_id: int | None = None,
                 offset: int = 0,
                 limit: int = 100) -> Paginated[TripSimple]:
-        trips, total = self.trip_repo.get_all(
-            route_id, service_id, direction_id, offset, limit)
+        trips, total = self.trip_repo.get_all(route_id,
+                                              service_id,
+                                              direction_id,
+                                              offset,
+                                              limit)
         results = [self._responsify(trip) for trip in trips]
 
         return Paginated[TripSimple](total=total,

@@ -24,7 +24,7 @@ class TripRepository:
     def get_all(self,
                 route_id: str | None,
                 service_id: str | None,
-                direction_id: str | None,
+                direction_id: int | None,
                 offset: int = 0,
                 limit: int = 100) -> Tuple[List[Trip], int]:
         """
@@ -33,7 +33,7 @@ class TripRepository:
         Args:
             route_id (str | None): Filter by route ID
             service_id (str | None): Filter by service ID
-            direction_id (str | None): Filter by direction ID
+            direction_id (int | None): Filter by direction ID
             offset (int): Number of trips to skip
             limit (int): Maximum number of trips to return
 
