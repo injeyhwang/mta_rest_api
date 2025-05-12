@@ -14,5 +14,5 @@ class ResourceNotFoundError(ServiceError):
 
 
 class QueryInvalidError(ServiceError):
-    """Raised when a request query is in invalid format"""
+    """Raised when a request query is invalid"""
     pass
