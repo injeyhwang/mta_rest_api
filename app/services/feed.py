@@ -12,7 +12,7 @@ from app.exceptions.feed import (FeedEndpointNotFoundError, FeedFetchError,
                                  FeedProcessingError, FeedServiceError,
                                  FeedTimeoutError)
 from app.schemas.feed import (AlertEntity, Entity, EntityType, FeedResponse,
-                              TripUpdateEntity)
+                              TripUpdateEntity, VehicleEntity)
 from app.utils.logger import logger
 
 
@@ -88,7 +88,7 @@ class FeedService:
 
         Returns:
             Tuple[FeedResponse, int]: Tuple of alert filtered FeedResponse and
-                                      the filtered entities count
+            the filtered entities count
         """
         feed_res: FeedResponse = self.get_feed(feed)
 
@@ -118,8 +118,7 @@ class FeedService:
 
         Returns:
             Tuple[FeedResponse, int]: Tuple of trip_update filtered
-                                      FeedResponse and the filtered entities
-                                      count
+            FeedResponse and the filtered entities count
         """
         feed_res: FeedResponse = self.get_feed(feed)
 
@@ -130,6 +129,40 @@ class FeedService:
                                     stop_id=stop_id,
                                     trip_id=trip_id,
                                     filter_by=EntityType.TRIP_UPDATE):
+                filtered_entities.append(entity)
+        entity_count = len(filtered_entities)
+        return (FeedResponse(header=feed_res.header,
+                             entity=filtered_entities), entity_count)
+
+    def get_vehicle_updates(
+            self,
+            feed: str,
+            route_id: str | None = None,
+            stop_id: str | None = None,
+            trip_id: str | None = None) -> Tuple[FeedResponse, int]:
+        """
+        Get real-time vehicle data from MTA's GTFS-RT API for the specified
+        feed.
+
+        Args:
+            feed (str): Feed identifier
+            route_id (str | None): Route ID to filter by
+            stop_id (str | None): Stop ID to filter by
+            trip_id (str | None): Trip ID to filter by
+
+        Returns:
+            Tuple[FeedResponse, int]: Tuple of vehicle filtered FeedResponse
+            and the filtered entities count
+        """
+        feed_res: FeedResponse = self.get_feed(feed)
+
+        filtered_entities: List[VehicleEntity] = []
+        for entity in feed_res.entity:
+            if self._include_entity(entity=entity,
+                                    route_id=route_id,
+                                    stop_id=stop_id,
+                                    trip_id=trip_id,
+                                    filter_by=EntityType.VEHICLE):
                 filtered_entities.append(entity)
         entity_count = len(filtered_entities)
         return (FeedResponse(header=feed_res.header,
