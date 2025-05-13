@@ -16,6 +16,7 @@ class Feed(str, Enum):
 
 
 class EntityType(str, Enum):
+    ALERT = "alert"
     TRIP_UPDATE = "trip_schedule_update"
     VEHICLE = "vehicle_position"
 
@@ -51,7 +52,7 @@ class StopTimeUpdateData(BaseModel):
     specific stop, including its relationship to the schedule.
     """
     stop_id: str | None = Field(
-        default=None,
+        default=None,  # remove
         description="GTFS stop_id where the prediction applies")
     arrival: TimeData | None = Field(
         default=None,
@@ -80,6 +81,45 @@ class TripData(BaseModel):
         description="Service date for the trip in YYYYMMDD format")
 
 
+class InformedEntity(BaseModel):
+    trip: TripData = Field("Alerted trips")
+
+
+class HeaderText(BaseModel):
+    text: str = Field("Description of the alert")
+
+
+class AlertHeaderData(BaseModel):
+    translation: List[HeaderText] = Field(
+        description="List of translated header text")
+
+
+class AlertData(BaseModel):
+    """
+    Real-time feed alert information for a specific feed.
+
+    Lists impacted trips for this alert.
+    """
+    header_text: AlertHeaderData = Field(description="")
+    informed_entity: List[InformedEntity] = Field(
+        default=[],
+        description="List of trips alerted")
+
+
+class TripUpdateData(BaseModel):
+    """
+    Real-time trip update information for a specific feed.
+
+    Contains predictions for arrival and departure times at stops along
+    a trip's route, representing deviations from the static schedule.
+    """
+    trip: TripData = Field(
+        description="Trip identifier for these updates")
+    stop_time_update: List[StopTimeUpdateData] = Field(
+        default=[],
+        description="Predicted times for stops along this trip")
+
+
 class VehicleData(BaseModel):
     """
     Real-time position information for a transit vehicle.
@@ -93,26 +133,11 @@ class VehicleData(BaseModel):
         description="Unix timestamp when this position was recorded")
     stop_id: str = Field(
         description="Nearest stop to the vehicle's current position")
-    current_stop_sequence: int | None = Field(
-        default=None,
+    current_stop_sequence: int = Field(
         description="Index of current stop in the trip's stop sequence")
     current_status: VehicleStatus | None = Field(
         default=None,
         description="Vehicle's status relative to the current stop")
-
-
-class TripUpdateData(BaseModel):
-    """
-    Real-time schedule updates for a trip.
-
-    Contains predictions for arrival and departure times at stops along
-    a trip's route, representing deviations from the static schedule.
-    """
-    trip: TripData = Field(
-        description="Trip identifier for these updates")
-    stop_time_update: List[StopTimeUpdateData] = Field(
-        default=[],
-        description="Predicted times for stops along this trip")
 
 
 class FeedResponseHeader(BaseModel):
@@ -138,17 +163,21 @@ class Entity(BaseModel):
     """
     id: str = Field(
         description="Unique identifier for this entity in the feed")
+    alert: AlertData | None = Field(
+        default=None,
+        description="Real-time alert information")
     trip_update: TripUpdateData | None = Field(
         default=None,
         description="Real-time trip schedule update information")
     vehicle: VehicleData | None = Field(
         default=None,
-        description="Vehicle position information")
-    # NOTE: 'alert' field would be added here if MTA implements service alerts
+        description="Real-time vehicle position information")
 
     @property
     def entity_type(self) -> EntityType:
-        if self.trip_update is not None:
+        if self.alert is not None:
+            return EntityType.ALERT
+        elif self.trip_update is not None:
             return EntityType.TRIP_UPDATE
         elif self.vehicle is not None:
             return EntityType.VEHICLE
