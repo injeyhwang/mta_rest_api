@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Path, status
 
 from app.dependencies import get_route_service
 from app.exceptions.base import ResourceNotFoundError
-from app.schemas.route import RouteDetailed
+from app.schemas.route import RouteResponse
 from app.services.route import RouteService
 from app.utils.logger import logger
 
@@ -12,14 +12,14 @@ router = APIRouter(prefix="/routes", tags=["routes"])
 
 
 @router.get("/",
-            response_model=List[RouteDetailed],
+            response_model=List[RouteResponse],
             status_code=status.HTTP_200_OK,
             summary="Get all subway routes",
             description="Retrieve all subway routes",
             responses={500: {"description": "Error retrieving routes"}})
 def get_routes(
         service: RouteService = Depends(get_route_service)
-) -> List[RouteDetailed]:
+) -> List[RouteResponse]:
     try:
         return service.get_all()
 
@@ -30,7 +30,7 @@ def get_routes(
 
 
 @router.get("/{route_id}",
-            response_model=RouteDetailed,
+            response_model=RouteResponse,
             status_code=status.HTTP_200_OK,
             summary="Get subway route by ID",
             description="Retrieve the subway route by given ID",
@@ -38,7 +38,7 @@ def get_routes(
                        500: {"description": "Error retrieving route"}})
 def get_route_by_id(
         route_id: str = Path(description="The route ID to search"),
-        service: RouteService = Depends(get_route_service)) -> RouteDetailed:
+        service: RouteService = Depends(get_route_service)) -> RouteResponse:
     try:
         return service.get_by_id(route_id)
 

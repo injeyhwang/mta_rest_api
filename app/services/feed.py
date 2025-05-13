@@ -86,8 +86,8 @@ class FeedService:
                      offset: int = 0,
                      limit: int = 1000) -> Tuple[FeedResponse, int]:
         """
-        Get all, paginated, real-time data from MTA's GTFS-RT API for the
-        specified feed.
+        Get all, PaginatedResponse, real-time data from MTA's GTFS-RT API for
+        the specified feed.
 
         Args:
             feed (str): Feed identifier

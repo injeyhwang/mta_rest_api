@@ -4,9 +4,9 @@ from app.db.models import Trip
 from app.db.repositories.stop_time import StopTimeRepository
 from app.db.repositories.trip import TripRepository
 from app.exceptions.base import QueryInvalidError, ResourceNotFoundError
-from app.schemas.pagination import Paginated
-from app.schemas.trip import (ScheduledStop, TripDetailed, TripSchedule,
-                              TripSimple)
+from app.schemas.pagination import PaginatedResponse
+from app.schemas.trip import (ScheduledStop, TripDetailedResponse,
+                              TripResponse, TripSchedule)
 from app.utils.helpers import valid_time_format
 
 
@@ -19,7 +19,7 @@ class TripService:
     def get_by_id(self,
                   trip_id: str,
                   arrival_time: str | None = None,
-                  departure_time: str | None = None) -> TripDetailed:
+                  departure_time: str | None = None) -> TripDetailedResponse:
         trip = self.trip_repo.get_by_id(trip_id)
         if not trip:
             raise ResourceNotFoundError(f"Trip with ID '{trip_id}' not found")
@@ -41,7 +41,7 @@ class TripService:
                 service_id: str | None = None,
                 direction_id: int | None = None,
                 offset: int = 0,
-                limit: int = 100) -> Paginated[TripSimple]:
+                limit: int = 100) -> PaginatedResponse[TripResponse]:
         trips, total = self.trip_repo.get_all(route_id,
                                               service_id,
                                               direction_id,
@@ -49,23 +49,23 @@ class TripService:
                                               limit)
         results = [self._responsify(trip) for trip in trips]
 
-        return Paginated[TripSimple](total=total,
-                                     offset=offset,
-                                     limit=limit,
-                                     results=results)
+        return PaginatedResponse[TripResponse](total=total,
+                                               offset=offset,
+                                               limit=limit,
+                                               results=results)
 
-    def _responsify(self, trip: Trip) -> TripSimple:
-        return TripSimple(id=trip.trip_id,
-                          headsign=trip.trip_headsign,
-                          route_id=trip.route_id,
-                          service_id=trip.service_id,
-                          direction_id=trip.direction_id)
+    def _responsify(self, trip: Trip) -> TripResponse:
+        return TripResponse(id=trip.trip_id,
+                            headsign=trip.trip_headsign,
+                            route_id=trip.route_id,
+                            service_id=trip.service_id,
+                            direction_id=trip.direction_id)
 
     def _detailed_responsify(
             self,
             trip: Trip,
             arrival_time: str | None,
-            departure_time: str | None) -> TripDetailed:
+            departure_time: str | None) -> TripDetailedResponse:
         stop_times = self.stop_time_repo.get_all_by_trip_id(
             trip_id=trip.trip_id,
             arrival_time=arrival_time,
@@ -85,9 +85,9 @@ class TripService:
                 departure_time=stop_time.departure_time)
             results.append(stop_time_res)
 
-        return TripDetailed(id=trip.trip_id,
-                            headsign=trip.trip_headsign,
-                            route_id=trip.route_id,
-                            service_id=trip.service_id,
-                            direction_id=trip.direction_id,
-                            stop_times=results)
+        return TripDetailedResponse(id=trip.trip_id,
+                                    headsign=trip.trip_headsign,
+                                    route_id=trip.route_id,
+                                    service_id=trip.service_id,
+                                    direction_id=trip.direction_id,
+                                    stop_times=results)

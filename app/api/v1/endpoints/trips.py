@@ -2,8 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
 
 from app.dependencies import get_trip_service
 from app.exceptions.base import QueryInvalidError, ResourceNotFoundError
-from app.schemas.pagination import Paginated
-from app.schemas.trip import DirectionID, ServiceID, TripDetailed, TripSimple
+from app.schemas.pagination import PaginatedResponse
+from app.schemas.trip import (DirectionID, ServiceID, TripDetailedResponse,
+                              TripResponse)
 from app.services.trip import TripService
 from app.utils.logger import logger
 
@@ -11,12 +12,12 @@ router = APIRouter(prefix="/trips", tags=["trips"])
 
 
 @router.get("/",
-            response_model=Paginated[TripSimple],
+            response_model=PaginatedResponse[TripResponse],
             status_code=status.HTTP_200_OK,
-            summary="Get all paginated subway trips",
-            description=("Retrieve all paginated subway trips. Can be further "
-                         "filtered down by their route_id, service_id, and/or "
-                         "direction_id"),
+            summary="Get all PaginatedResponse subway trips",
+            description=("Retrieve all PaginatedResponse subway trips. Can be "
+                         "further filtered down by their route_id, "
+                         "service_id, and/or direction_id"),
             responses={500: {"description": "Error retrieving trips"}})
 def get_trips(
         route_id: str | None = Query(
@@ -40,7 +41,7 @@ def get_trips(
             le=1000,
             description="Maximum number of trips to return"),
         service: TripService = Depends(get_trip_service)
-) -> Paginated[TripSimple]:
+) -> PaginatedResponse[TripResponse]:
     try:
         return service.get_all(route_id,
                                service_id.value if service_id else None,
@@ -55,7 +56,7 @@ def get_trips(
 
 
 @router.get("/{trip_id}",
-            response_model=TripDetailed,
+            response_model=TripDetailedResponse,
             status_code=status.HTTP_200_OK,
             summary="Get detailed subway trip information",
             description=("Retrieve detailed subway trip information by given "
@@ -73,7 +74,8 @@ def get_trip_by_id(
         departure_time: str | None = Query(
             default=None,
             description="The departure time to filter this trip's stops by"),
-        service: TripService = Depends(get_trip_service)) -> TripDetailed:
+        service: TripService = Depends(get_trip_service)
+) -> TripDetailedResponse:
     try:
         return service.get_by_id(trip_id, arrival_time, departure_time)
 

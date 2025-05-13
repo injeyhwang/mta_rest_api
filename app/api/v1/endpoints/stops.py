@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
 
 from app.dependencies import get_stop_service
 from app.exceptions.base import QueryInvalidError, ResourceNotFoundError
-from app.schemas.stop import StopDetailed, StopSimple
+from app.schemas.stop import StopDetailedResponse, StopResponse
 from app.schemas.trip import DirectionID, ServiceID
 from app.services.stop import StopService
 from app.utils.logger import logger
@@ -13,7 +13,7 @@ router = APIRouter(prefix="/stops", tags=["stops"])
 
 
 @router.get("/",
-            response_model=List[StopSimple],
+            response_model=List[StopResponse],
             status_code=status.HTTP_200_OK,
             summary="Get all subway stops",
             description="Retrieve all subway stops",
@@ -24,7 +24,7 @@ def get_stops(
             description=("The direction ID to filter stops by. 1 is inbound "
                          "trains or North bound. 0 is outbound trains or "
                          "South bound.")),
-        service: StopService = Depends(get_stop_service)) -> List[StopSimple]:
+        service: StopService = Depends(get_stop_service)) -> List[StopResponse]:
     try:
         return service.get_all(direction_id.value if direction_id else None)
 
@@ -35,7 +35,7 @@ def get_stops(
 
 
 @router.get("/{stop_id}",
-            response_model=StopDetailed,
+            response_model=StopDetailedResponse,
             status_code=status.HTTP_200_OK,
             summary="Get detailed subway stop information",
             description=("Retrieve detailed subway stop information by given "
@@ -59,7 +59,7 @@ def get_stop_by_id(
         departure_time: str | None = Query(
             default=None,
             description="The departure time to filter this stop's trips by"),
-        service: StopService = Depends(get_stop_service)) -> StopDetailed:
+        service: StopService = Depends(get_stop_service)) -> StopDetailedResponse:
     try:
         return service.get_by_id(stop_id,
                                  route_id,

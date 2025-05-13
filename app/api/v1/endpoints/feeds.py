@@ -5,7 +5,7 @@ from app.dependencies import get_feed_service
 from app.exceptions.feed import (FeedEndpointNotFoundError, FeedFetchError,
                                  FeedProcessingError, FeedTimeoutError)
 from app.schemas.feed import Entity, Feed
-from app.schemas.pagination import Paginated
+from app.schemas.pagination import PaginatedResponse
 from app.services.feed import FeedService
 from app.utils.logger import logger
 
@@ -13,7 +13,7 @@ router = APIRouter(prefix="/feeds", tags=["feeds"])
 
 
 @router.get("/{feed}",
-            response_model=Paginated[Entity],
+            response_model=PaginatedResponse[Entity],
             status_code=status.HTTP_200_OK,
             summary="Get all real-time subway feed",
             description="Retrieve real-time data for a given subway feed",
@@ -42,7 +42,8 @@ async def get_all_feed(
             ge=1,
             le=1000,
             description="Maximum number of entities to return"),
-        service: FeedService = Depends(get_feed_service)) -> Paginated[Entity]:
+        service: FeedService = Depends(get_feed_service)
+) -> PaginatedResponse[Entity]:
     try:
         res, total = service.get_all_feed(feed.value,
                                           route_id,
@@ -55,10 +56,10 @@ async def get_all_feed(
             res.header.gtfs_realtime_version
         response.headers["X-GTFS-RT-Timestamp"] = res.header.timestamp
 
-        return Paginated[Entity](total=total,
-                                 offset=offset,
-                                 limit=limit,
-                                 results=res.entity)
+        return PaginatedResponse[Entity](total=total,
+                                         offset=offset,
+                                         limit=limit,
+                                         results=res.entity)
 
     except FeedEndpointNotFoundError as e:
         logger.error(f"Endpoint not found for feed '{feed}': {e}")

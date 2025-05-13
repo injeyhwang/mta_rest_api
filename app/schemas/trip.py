@@ -33,7 +33,7 @@ class TripSchedule(BaseModel):
     departure_time: str = Field(description="Departure time from the stop")
 
 
-class TripSimple(BaseModel):
+class TripResponse(BaseModel):
     id: str = Field(description="Unique identifier for the trip")
     headsign: str = Field(description="Text that appears on head signage")
     route_id: str = Field(description="Route ID the trip takes")
@@ -43,7 +43,7 @@ class TripSimple(BaseModel):
         description="Direction of travel (1=inbound, 0=outbound)")
 
 
-class TripDetailed(BaseModel):
+class TripDetailedResponse(BaseModel):
     id: str = Field(description="Unique identifier for the trip")
     headsign: str = Field(description="Text that appears on head signage")
     route_id: str = Field(description="Route ID the trip takes")

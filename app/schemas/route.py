@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
 
 
-class RouteDetailed(BaseModel):
+class RouteResponse(BaseModel):
     id: str = Field(description="Unique identifier for the route")
     short_name: str = Field(description="Short name of the route")
     long_name: str = Field(description="Full name of the route")
