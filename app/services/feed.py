@@ -78,7 +78,7 @@ class FeedService:
             logger.exception(f"Error processing GTFS-RT feed: {e}")
             raise FeedProcessingError(f"Error processing GTFS-RT feed: {e}")
 
-    def get_feed_alerts(self, feed: str) -> FeedResponse:
+    def get_alerts(self, feed: str) -> FeedResponse:
         """
         Get real-time alert data from MTA's GTFS-RT API for the specified feed.
 

@@ -104,7 +104,7 @@ async def get_alert_updates(
         feed: Feed = Path(description="The subway feed to request"),
         service: FeedService = Depends(get_feed_service)) -> List[AlertEntity]:
     try:
-        res = service.get_feed_alerts(feed.value)
+        res = service.get_alerts(feed.value)
 
         response.headers["X-GTFS-RT-Version"] = \
             res.header.gtfs_realtime_version
