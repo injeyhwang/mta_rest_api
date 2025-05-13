@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import List
+from typing import List, Union
 
 from pydantic import BaseModel, Field
 
@@ -141,6 +141,48 @@ class VehicleData(BaseModel):
         description="Vehicle's status relative to the current stop")
 
 
+class AlertEntity(BaseModel):
+    """
+    Alert entity that contains alert and a list of trips that are informed
+    of the alert.
+    """
+    id: str = Field(
+        description="Unique identifier for this entity in the feed")
+    alert: AlertData = Field(description="Real-time alert information")
+
+    @property
+    def entity_type(self) -> EntityType:
+        return EntityType.ALERT
+
+
+class TripUpdateEntity(BaseModel):
+    """
+    Trip update entity that contain trip schedule updates.
+    """
+    id: str = Field(
+        description="Unique identifier for this entity in the feed")
+    trip_update: TripUpdateData = Field(
+        description="Real-time trip schedule update information")
+
+    @property
+    def entity_type(self) -> EntityType:
+        return EntityType.TRIP_UPDATE
+
+
+class VehicleEntity(BaseModel):
+    """
+    Vehicle entity that contain vehicle trip and status information.
+    """
+    id: str = Field(
+        description="Unique identifier for this entity in the feed")
+    vehicle: VehicleData = Field(
+        description="Real-time vehicle position information")
+
+    @property
+    def entity_type(self) -> EntityType:
+        return EntityType.VEHICLE
+
+
 class FeedResponseHeader(BaseModel):
     """
     Metadata header for GTFS-RT feed messages.
@@ -154,34 +196,7 @@ class FeedResponseHeader(BaseModel):
         description="Unix timestamp when this feed update was generated")
 
 
-class Entity(BaseModel):
-    """
-    Generic entity that can contain trip updates, vehicle positions, or alerts.
-
-    In GTFS-RT, each entity in the feed must contain exactly one of:
-    trip_update, vehicle, or alert. This implementation supports
-    trip_update and vehicle entities.
-    """
-    id: str = Field(
-        description="Unique identifier for this entity in the feed")
-    alert: AlertData | None = Field(
-        default=None,
-        description="Real-time alert information")
-    trip_update: TripUpdateData | None = Field(
-        default=None,
-        description="Real-time trip schedule update information")
-    vehicle: VehicleData | None = Field(
-        default=None,
-        description="Real-time vehicle position information")
-
-    @property
-    def entity_type(self) -> EntityType:
-        if self.alert is not None:
-            return EntityType.ALERT
-        elif self.trip_update is not None:
-            return EntityType.TRIP_UPDATE
-        elif self.vehicle is not None:
-            return EntityType.VEHICLE
+Entity = Union[AlertEntity, TripUpdateEntity, VehicleEntity]
 
 
 class FeedResponse(BaseModel):
@@ -195,4 +210,5 @@ class FeedResponse(BaseModel):
     header: FeedResponseHeader = Field(
         description="Feed metadata including version and timestamp")
     entity: List[Entity] = Field(
-        description="Collection of trip updates and/or vehicle positions")
+        description=("Collection of feed entities comprised of alerts, "
+                     "trip_updates, and vehicle positions"))

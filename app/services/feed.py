@@ -11,7 +11,7 @@ from app.config import settings
 from app.exceptions.feed import (FeedEndpointNotFoundError, FeedFetchError,
                                  FeedProcessingError, FeedServiceError,
                                  FeedTimeoutError)
-from app.schemas.feed import Entity, EntityType, FeedResponse
+from app.schemas.feed import AlertEntity, Entity, EntityType, FeedResponse
 from app.utils.logger import logger
 
 
@@ -91,7 +91,7 @@ class FeedService:
         """
         feed_res: FeedResponse = self.get_feed(feed)
 
-        filtered_entities: List[Entity] = []
+        filtered_entities: List[AlertEntity] = []
         for entity in feed_res.entity:
             if self._include_entity(entity=entity, filter_by=EntityType.ALERT):
                 filtered_entities.append(entity)

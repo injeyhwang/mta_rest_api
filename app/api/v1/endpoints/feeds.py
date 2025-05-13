@@ -6,7 +6,8 @@ from fastapi import (APIRouter, Depends, HTTPException, Path, Query, Response,
 from app.dependencies import get_feed_service
 from app.exceptions.feed import (FeedEndpointNotFoundError, FeedFetchError,
                                  FeedProcessingError, FeedTimeoutError)
-from app.schemas.feed import Entity, EntityType, Feed
+from app.schemas.feed import (AlertEntity, Entity, EntityType, Feed,
+                              TripUpdateEntity, VehicleEntity)
 from app.schemas.pagination import PaginatedResponse
 from app.services.feed import FeedService
 from app.utils.logger import logger
@@ -90,7 +91,7 @@ async def get_all_feed(
 
 
 @router.get("/{feed}/alerts",
-            response_model=List[Entity],
+            response_model=List[AlertEntity],
             status_code=status.HTTP_200_OK,
             summary="Get real-time subway feed alert updates",
             description=("Retrieve real-time alert update data for a given "
@@ -101,7 +102,7 @@ async def get_all_feed(
 async def get_alert_updates(
         response: Response,
         feed: Feed = Path(description="The subway feed to request"),
-        service: FeedService = Depends(get_feed_service)) -> List[Entity]:
+        service: FeedService = Depends(get_feed_service)) -> List[AlertEntity]:
     try:
         res = service.get_feed_alerts(feed.value)
 
@@ -138,7 +139,7 @@ async def get_alert_updates(
 
 
 @router.get("/{feed}/trips",
-            response_model=PaginatedResponse[Entity],
+            response_model=PaginatedResponse[TripUpdateEntity],
             status_code=status.HTTP_200_OK,
             summary="Get real-time subway feed trip updates",
             description=("Retrieve real-time trip update data for a given "
@@ -168,7 +169,7 @@ async def get_trip_updates(
             le=1000,
             description="Maximum number of trip entities to return"),
         service: FeedService = Depends(get_feed_service)
-) -> PaginatedResponse[Entity]:
+) -> PaginatedResponse[TripUpdateEntity]:
     try:
         res, total = service.get_all_feed(feed.value,
                                           route_id,
@@ -182,10 +183,10 @@ async def get_trip_updates(
             res.header.gtfs_realtime_version
         response.headers["X-GTFS-RT-Timestamp"] = res.header.timestamp
 
-        return PaginatedResponse[Entity](total=total,
-                                         offset=offset,
-                                         limit=limit,
-                                         results=res.entity)
+        return PaginatedResponse[TripUpdateEntity](total=total,
+                                                   offset=offset,
+                                                   limit=limit,
+                                                   results=res.entity)
 
     except FeedEndpointNotFoundError as e:
         logger.error(f"Endpoint not found for feed '{feed}': {e}")
@@ -214,7 +215,7 @@ async def get_trip_updates(
 
 
 @router.get("/{feed}/vehicles",
-            response_model=PaginatedResponse[Entity],
+            response_model=PaginatedResponse[VehicleEntity],
             status_code=status.HTTP_200_OK,
             summary="Get real-time subway feed vehicle updates",
             description=("Retrieve real-time vehicle update data for a given "
@@ -244,7 +245,7 @@ async def get_vehicle_updates(
             le=1000,
             description="Maximum number of vehicles entities to return"),
         service: FeedService = Depends(get_feed_service)
-) -> PaginatedResponse[Entity]:
+) -> PaginatedResponse[VehicleEntity]:
     try:
         res, total = service.get_all_feed(feed.value,
                                           route_id,
@@ -258,10 +259,10 @@ async def get_vehicle_updates(
             res.header.gtfs_realtime_version
         response.headers["X-GTFS-RT-Timestamp"] = res.header.timestamp
 
-        return PaginatedResponse[Entity](total=total,
-                                         offset=offset,
-                                         limit=limit,
-                                         results=res.entity)
+        return PaginatedResponse[VehicleEntity](total=total,
+                                                offset=offset,
+                                                limit=limit,
+                                                results=res.entity)
 
     except FeedEndpointNotFoundError as e:
         logger.error(f"Endpoint not found for feed '{feed}': {e}")
