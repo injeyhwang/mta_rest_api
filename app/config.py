@@ -15,7 +15,7 @@ class Settings(BaseSettings):
 
     # App info
     app_name: str = "mta_rest_api"
-    app_version: str = "0.18.2"
+    app_version: str = "0.19.0"
     app_description: str = (
         "A simple REST API reverse proxy for MTA's "
         "complicated GTFS and GTFS-RT APIs.")

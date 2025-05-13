@@ -1,5 +1,3 @@
-from typing import List
-
 from fastapi import (APIRouter, Depends, HTTPException, Path, Query, Response,
                      status)
 
@@ -8,7 +6,7 @@ from app.exceptions.feed import (FeedEndpointNotFoundError, FeedFetchError,
                                  FeedProcessingError, FeedTimeoutError)
 from app.schemas.feed import (AlertEntity, Entity, EntityType, Feed,
                               TripUpdateEntity, VehicleEntity)
-from app.schemas.pagination import PaginatedResponse
+from app.schemas.pagination import ListResponse, PaginatedResponse
 from app.services.feed import FeedService
 from app.utils.logger import logger
 
@@ -91,7 +89,7 @@ async def get_all_feed(
 
 
 @router.get("/{feed}/alerts",
-            response_model=List[AlertEntity],
+            response_model=ListResponse[AlertEntity],
             status_code=status.HTTP_200_OK,
             summary="Get real-time subway feed alert updates",
             description=("Retrieve real-time alert update data for a given "
@@ -102,15 +100,17 @@ async def get_all_feed(
 async def get_alert_updates(
         response: Response,
         feed: Feed = Path(description="The subway feed to request"),
-        service: FeedService = Depends(get_feed_service)) -> List[AlertEntity]:
+        service: FeedService = Depends(get_feed_service)
+) -> ListResponse[AlertEntity]:
     try:
-        res = service.get_alerts(feed.value)
+        res, entity_count = service.get_alerts(feed.value)
 
         response.headers["X-GTFS-RT-Version"] = \
             res.header.gtfs_realtime_version
         response.headers["X-GTFS-RT-Timestamp"] = res.header.timestamp
 
-        return res.entity
+        return ListResponse[AlertEntity](total=entity_count,
+                                         results=res.entity)
 
     except FeedEndpointNotFoundError as e:
         logger.error(f"Endpoint not found for feed '{feed}': {e}")
@@ -139,7 +139,7 @@ async def get_alert_updates(
 
 
 @router.get("/{feed}/trips",
-            response_model=PaginatedResponse[TripUpdateEntity],
+            response_model=ListResponse[TripUpdateEntity],
             status_code=status.HTTP_200_OK,
             summary="Get real-time subway feed trip updates",
             description=("Retrieve real-time trip update data for a given "
@@ -159,34 +159,20 @@ async def get_trip_updates(
         trip_id: str | None = Query(
             default=None,
             description="The trip ID to filter trip entities by"),
-        offset: int = Query(
-            default=0,
-            ge=0,
-            description="Number of trip entities to skip"),
-        limit: int = Query(
-            default=10,
-            ge=1,
-            le=1000,
-            description="Maximum number of trip entities to return"),
         service: FeedService = Depends(get_feed_service)
-) -> PaginatedResponse[TripUpdateEntity]:
+) -> ListResponse[TripUpdateEntity]:
     try:
-        res, total = service.get_all_feed(feed.value,
-                                          route_id,
-                                          stop_id,
-                                          trip_id,
-                                          EntityType.TRIP_UPDATE,
-                                          offset,
-                                          limit)
+        res, entity_count = service.get_trip_updates(feed.value,
+                                                     route_id,
+                                                     stop_id,
+                                                     trip_id)
 
         response.headers["X-GTFS-RT-Version"] = \
             res.header.gtfs_realtime_version
         response.headers["X-GTFS-RT-Timestamp"] = res.header.timestamp
 
-        return PaginatedResponse[TripUpdateEntity](total=total,
-                                                   offset=offset,
-                                                   limit=limit,
-                                                   results=res.entity)
+        return ListResponse[TripUpdateEntity](total=entity_count,
+                                              results=res.entity)
 
     except FeedEndpointNotFoundError as e:
         logger.error(f"Endpoint not found for feed '{feed}': {e}")

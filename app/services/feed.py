@@ -11,7 +11,8 @@ from app.config import settings
 from app.exceptions.feed import (FeedEndpointNotFoundError, FeedFetchError,
                                  FeedProcessingError, FeedServiceError,
                                  FeedTimeoutError)
-from app.schemas.feed import AlertEntity, Entity, EntityType, FeedResponse
+from app.schemas.feed import (AlertEntity, Entity, EntityType, FeedResponse,
+                              TripUpdateEntity)
 from app.utils.logger import logger
 
 
@@ -78,7 +79,7 @@ class FeedService:
             logger.exception(f"Error processing GTFS-RT feed: {e}")
             raise FeedProcessingError(f"Error processing GTFS-RT feed: {e}")
 
-    def get_alerts(self, feed: str) -> FeedResponse:
+    def get_alerts(self, feed: str) -> Tuple[FeedResponse, int]:
         """
         Get real-time alert data from MTA's GTFS-RT API for the specified feed.
 
@@ -86,8 +87,8 @@ class FeedService:
             feed (str): Feed identifier
 
         Returns:
-            FeedResponse: Parsed GTFS-RT message filtered down to alert
-            entities.
+            Tuple[FeedResponse, int]: Tuple of alert filtered FeedResponse and
+                                      the filtered entities count
         """
         feed_res: FeedResponse = self.get_feed(feed)
 
@@ -95,8 +96,44 @@ class FeedService:
         for entity in feed_res.entity:
             if self._include_entity(entity=entity, filter_by=EntityType.ALERT):
                 filtered_entities.append(entity)
-        return FeedResponse(header=feed_res.header,
-                            entity=filtered_entities)
+        entity_count = len(filtered_entities)
+        return (FeedResponse(header=feed_res.header,
+                             entity=filtered_entities), entity_count)
+
+    def get_trip_updates(
+            self,
+            feed: str,
+            route_id: str | None = None,
+            stop_id: str | None = None,
+            trip_id: str | None = None) -> Tuple[FeedResponse, int]:
+        """
+        Get real-time trip update data from MTA's GTFS-RT API for the specified
+        feed.
+
+        Args:
+            feed (str): Feed identifier
+            route_id (str | None): Route ID to filter by
+            stop_id (str | None): Stop ID to filter by
+            trip_id (str | None): Trip ID to filter by
+
+        Returns:
+            Tuple[FeedResponse, int]: Tuple of trip_update filtered
+                                      FeedResponse and the filtered entities
+                                      count
+        """
+        feed_res: FeedResponse = self.get_feed(feed)
+
+        filtered_entities: List[TripUpdateEntity] = []
+        for entity in feed_res.entity:
+            if self._include_entity(entity=entity,
+                                    route_id=route_id,
+                                    stop_id=stop_id,
+                                    trip_id=trip_id,
+                                    filter_by=EntityType.TRIP_UPDATE):
+                filtered_entities.append(entity)
+        entity_count = len(filtered_entities)
+        return (FeedResponse(header=feed_res.header,
+                             entity=filtered_entities), entity_count)
 
     def get_all_feed(self,
                      feed: str,
@@ -134,12 +171,12 @@ class FeedService:
                 filtered_entities.append(entity)
 
         # apply pagination to filtered_entities
-        total_items = len(filtered_entities)
+        entity_count = len(filtered_entities)
         filtered_entities = filtered_entities[offset:offset + limit]
 
         filtered_res = FeedResponse(header=feed_res.header,
                                     entity=filtered_entities)
-        return filtered_res, total_items
+        return filtered_res, entity_count
 
     def _include_entity(
             self,
