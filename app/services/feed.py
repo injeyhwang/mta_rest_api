@@ -170,10 +170,10 @@ class FeedService:
 
     def get_all_feed(self,
                      feed: str,
+                     entity_type: EntityType | None = None,
                      route_id: str | None = None,
                      stop_id: str | None = None,
                      trip_id: str | None = None,
-                     entity_type: EntityType | None = None,
                      offset: int = 0,
                      limit: int = 1000) -> Tuple[FeedResponse, int]:
         """

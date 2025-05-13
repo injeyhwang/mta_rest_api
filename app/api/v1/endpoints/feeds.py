@@ -4,8 +4,8 @@ from fastapi import (APIRouter, Depends, HTTPException, Path, Query, Response,
 from app.dependencies import get_feed_service
 from app.exceptions.feed import (FeedEndpointNotFoundError, FeedFetchError,
                                  FeedProcessingError, FeedTimeoutError)
-from app.schemas.feed import (AlertEntity, Entity, Feed, TripUpdateEntity,
-                              VehicleEntity)
+from app.schemas.feed import (AlertEntity, Entity, EntityType, Feed,
+                              TripUpdateEntity, VehicleEntity)
 from app.schemas.pagination import ListResponse, PaginatedResponse
 from app.services.feed import FeedService
 from app.utils.logger import logger
@@ -24,15 +24,18 @@ router = APIRouter(prefix="/feeds", tags=["feeds"])
 async def get_all_feed(
         response: Response,
         feed: Feed = Path(description="The subway feed to request"),
+        entity_type: EntityType | None = Query(
+            default=None,
+            description="The entity type to filter by"),
         route_id: str | None = Query(
             default=None,
-            description="The route ID to filter feed entities by"),
+            description="The route ID to filter by"),
         stop_id: str | None = Query(
             default=None,
-            description="The stop ID to filter feed entities by"),
+            description="The stop ID to filter by"),
         trip_id: str | None = Query(
             default=None,
-            description="The trip ID to filter this feed entities by"),
+            description="The trip ID to filter by"),
         offset: int = Query(
             default=0,
             ge=0,
@@ -45,13 +48,13 @@ async def get_all_feed(
         service: FeedService = Depends(get_feed_service)
 ) -> PaginatedResponse[Entity]:
     try:
-        res, total = service.get_all_feed(feed.value,
-                                          route_id,
-                                          stop_id,
-                                          trip_id,
-                                          None,
-                                          offset,
-                                          limit)
+        res, total = service.get_all_feed(feed=feed.value,
+                                          entity_type=entity_type,
+                                          route_id=route_id,
+                                          stop_id=stop_id,
+                                          trip_id=trip_id,
+                                          offset=offset,
+                                          limit=limit)
 
         response.headers["X-GTFS-RT-Version"] = \
             res.header.gtfs_realtime_version

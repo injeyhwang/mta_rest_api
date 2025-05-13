@@ -17,8 +17,8 @@ class Feed(str, Enum):
 
 class EntityType(str, Enum):
     ALERT = "alert"
-    TRIP_UPDATE = "trip_schedule_update"
-    VEHICLE = "vehicle_position"
+    TRIP_UPDATE = "trip_update"
+    VEHICLE = "vehicle"
 
 
 class VehicleStatus(str, Enum):
