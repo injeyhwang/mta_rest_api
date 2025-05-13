@@ -53,9 +53,6 @@ class StopTimeUpdateData(BaseModel):
     stop_id: str | None = Field(
         default=None,
         description="GTFS stop_id where the prediction applies")
-    stop_sequence: int | None = Field(
-        default=None,
-        description="Sequential order of this stop on the trip route")
     arrival: TimeData | None = Field(
         default=None,
         description="Predicted arrival time at this stop")
