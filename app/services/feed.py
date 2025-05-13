@@ -180,7 +180,13 @@ class FeedService:
                 return False
             if route_id and trip_update.trip.route_id != route_id:
                 return False
-            # doesn't make sense to filter stop_time_updates by stop_id
+
+            if stop_id:
+                if len(trip_update.stop_time_update) == 0:
+                    return False
+                stop_time_update = trip_update.stop_time_update
+                if not any(stu.stop_id == stop_id for stu in stop_time_update):
+                    return False
 
         elif entity.entity_type == EntityType.VEHICLE:
             if filter_by and filter_by != EntityType.VEHICLE:
