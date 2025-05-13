@@ -166,7 +166,12 @@ class FeedService:
                 and stop_id is None and trip_id is None and filter_by is None):
             return True
 
-        if entity.entity_type == EntityType.TRIP_UPDATE:
+        if entity.entity_type == EntityType.ALERT:
+            if filter_by and filter_by != EntityType.ALERT:
+                return False
+            # alert entities can't be filtered by route_id, stop_id, trip_id
+
+        elif entity.entity_type == EntityType.TRIP_UPDATE:
             if filter_by and filter_by != EntityType.TRIP_UPDATE:
                 return False
 
