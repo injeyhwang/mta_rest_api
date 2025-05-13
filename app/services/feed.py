@@ -83,17 +83,19 @@ class FeedService:
                      route_id: str | None = None,
                      stop_id: str | None = None,
                      trip_id: str | None = None,
+                     entity_type: EntityType | None = None,
                      offset: int = 0,
                      limit: int = 1000) -> Tuple[FeedResponse, int]:
         """
-        Get all, PaginatedResponse, real-time data from MTA's GTFS-RT API for
-        the specified feed.
+        Get all real-time paginated data from MTA's GTFS-RT API for the
+        specified feed.
 
         Args:
             feed (str): Feed identifier
             route_id (str | None): Route ID to filter by
             stop_id (str | None): Stop ID to filter by
             trip_id (str | None): Trip ID to filter by
+            entity_type (EntityType | None): Entity type to filter by
             offset (int): Number of items to skip
             limit (int): Maximum number of items to return
 
@@ -104,7 +106,11 @@ class FeedService:
 
         filtered_entities: List[Entity] = []
         for entity in feed_res.entity:
-            if self._include_entity(entity, route_id, stop_id, trip_id):
+            if self._include_entity(entity,
+                                    route_id,
+                                    stop_id,
+                                    trip_id,
+                                    entity_type):
                 filtered_entities.append(entity)
 
         # apply pagination to filtered_entities
