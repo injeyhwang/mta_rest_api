@@ -72,9 +72,11 @@ class TripData(BaseModel):
         description="Unique identifier matching GTFS trips.txt trip_id")
     route_id: str = Field(
         description="Route identifier matching GTFS routes.txt route_id")
-    start_time: str = Field(
+    start_time: str | None = Field(
+        default=None,
         description="Scheduled trip start time in HH:MM:SS format")
-    start_date: str = Field(
+    start_date: str | None = Field(
+        default=None,
         description="Service date for the trip in YYYYMMDD format")
 
 
