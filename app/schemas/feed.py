@@ -133,7 +133,8 @@ class VehicleData(BaseModel):
         description="Unix timestamp when this position was recorded")
     stop_id: str = Field(
         description="Nearest stop to the vehicle's current position")
-    current_stop_sequence: int = Field(
+    current_stop_sequence: int | None = Field(
+        default=None,
         description="Index of current stop in the trip's stop sequence")
     current_status: VehicleStatus | None = Field(
         default=None,

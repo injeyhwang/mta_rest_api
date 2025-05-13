@@ -1,3 +1,5 @@
+from typing import List
+
 from fastapi import (APIRouter, Depends, HTTPException, Path, Query, Response,
                      status)
 
@@ -87,6 +89,54 @@ async def get_all_feed(
                             detail="An unexpected error occurred")
 
 
+@router.get("/{feed}/alerts",
+            response_model=List[Entity],
+            status_code=status.HTTP_200_OK,
+            summary="Get real-time subway feed alert updates",
+            description=("Retrieve real-time alert update data for a given "
+                         "subway feed"),
+            responses={500: {"description": "Error processing GTFS-RT feed"},
+                       502: {"description": "Error fetching GTFS-RT feed"},
+                       504: {"description": "Timeout fetching GTFS-RT feed"}})
+async def get_alert_updates(
+        response: Response,
+        feed: Feed = Path(description="The subway feed to request"),
+        service: FeedService = Depends(get_feed_service)) -> List[Entity]:
+    try:
+        res = service.get_feed_alerts(feed.value)
+
+        response.headers["X-GTFS-RT-Version"] = \
+            res.header.gtfs_realtime_version
+        response.headers["X-GTFS-RT-Timestamp"] = res.header.timestamp
+
+        return res.entity
+
+    except FeedEndpointNotFoundError as e:
+        logger.error(f"Endpoint not found for feed '{feed}': {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail=str(e))
+
+    except FeedFetchError as e:
+        logger.error(f"Error fetching feed '{feed}': {e}")
+        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY,
+                            detail=str(e))
+
+    except FeedTimeoutError as e:
+        logger.error(f"Timeout fetching feed '{feed}': {e}")
+        raise HTTPException(status_code=status.HTTP_504_GATEWAY_TIMEOUT,
+                            detail=str(e))
+
+    except FeedProcessingError as e:
+        logger.error(f"Processing error for feed '{feed}': {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail=str(e))
+
+    except Exception as e:
+        logger.exception(f"Unexpected error for feed '{feed}': {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail="An unexpected error occurred")
+
+
 @router.get("/{feed}/trips",
             response_model=PaginatedResponse[Entity],
             status_code=status.HTTP_200_OK,
@@ -95,8 +145,7 @@ async def get_all_feed(
                          "subway feed"),
             responses={500: {"description": "Error processing GTFS-RT feed"},
                        502: {"description": "Error fetching GTFS-RT feed"},
-                       504: {"description": "Timeout fetching GTFS-RT feed"}},
-            tags=['trip'])
+                       504: {"description": "Timeout fetching GTFS-RT feed"}})
 async def get_trip_updates(
         response: Response,
         feed: Feed = Path(description="The subway trip to request"),
@@ -172,8 +221,7 @@ async def get_trip_updates(
                          "subway feed"),
             responses={500: {"description": "Error processing GTFS-RT feed"},
                        502: {"description": "Error fetching GTFS-RT feed"},
-                       504: {"description": "Timeout fetching GTFS-RT feed"}},
-            tags=['vehicle'])
+                       504: {"description": "Timeout fetching GTFS-RT feed"}})
 async def get_vehicle_updates(
         response: Response,
         feed: Feed = Path(description="The subway feed to request"),

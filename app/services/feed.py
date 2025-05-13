@@ -78,6 +78,26 @@ class FeedService:
             logger.exception(f"Error processing GTFS-RT feed: {e}")
             raise FeedProcessingError(f"Error processing GTFS-RT feed: {e}")
 
+    def get_feed_alerts(self, feed: str) -> FeedResponse:
+        """
+        Get real-time alert data from MTA's GTFS-RT API for the specified feed.
+
+        Args:
+            feed (str): Feed identifier
+
+        Returns:
+            FeedResponse: Parsed GTFS-RT message filtered down to alert
+            entities.
+        """
+        feed_res: FeedResponse = self.get_feed(feed)
+
+        filtered_entities: List[Entity] = []
+        for entity in feed_res.entity:
+            if self._include_entity(entity=entity, filter_by=EntityType.ALERT):
+                filtered_entities.append(entity)
+        return FeedResponse(header=feed_res.header,
+                            entity=filtered_entities)
+
     def get_all_feed(self,
                      feed: str,
                      route_id: str | None = None,
@@ -106,11 +126,11 @@ class FeedService:
 
         filtered_entities: List[Entity] = []
         for entity in feed_res.entity:
-            if self._include_entity(entity,
-                                    route_id,
-                                    stop_id,
-                                    trip_id,
-                                    entity_type):
+            if self._include_entity(entity=entity,
+                                    route_id=route_id,
+                                    stop_id=stop_id,
+                                    trip_id=trip_id,
+                                    filter_by=entity_type):
                 filtered_entities.append(entity)
 
         # apply pagination to filtered_entities
