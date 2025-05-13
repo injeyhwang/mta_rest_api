@@ -15,15 +15,24 @@ router = APIRouter(prefix="/feeds", tags=["feeds"])
 @router.get("/{feed}",
             response_model=Paginated[Entity],
             status_code=status.HTTP_200_OK,
-            summary="Get real-time subway feed",
+            summary="Get all real-time subway feed",
             description="Retrieve real-time data for a given subway feed",
             responses={
                 500: {"description": "Error processing GTFS-RT feed"},
                 502: {"description": "Error fetching GTFS-RT feed"},
                 504: {"description": "Timeout fetching GTFS-RT feed"}})
-async def get_feed(
+async def get_all_feed(
         response: Response,
         feed: Feed = Path(description="The subway feed to request"),
+        route_id: str | None = Query(
+            default=None,
+            description="The route ID to filter feed entities by"),
+        stop_id: str | None = Query(
+            default=None,
+            description="The stop ID to filter feed entities by"),
+        trip_id: str | None = Query(
+            default=None,
+            description="The trip ID to filter this feed entities by"),
         offset: int = Query(
             default=0,
             ge=0,
@@ -31,20 +40,25 @@ async def get_feed(
         limit: int = Query(
             default=10,
             ge=1,
-            le=500,
+            le=1000,
             description="Maximum number of entities to return"),
         service: FeedService = Depends(get_feed_service)) -> Paginated[Entity]:
     try:
-        res, total = service.get_paginated_feed(feed.value, offset, limit)
+        res, total = service.get_all_feed(feed.value,
+                                          route_id,
+                                          stop_id,
+                                          trip_id,
+                                          offset,
+                                          limit)
 
         response.headers["X-GTFS-RT-Version"] = \
             res.header.gtfs_realtime_version
         response.headers["X-GTFS-RT-Timestamp"] = res.header.timestamp
 
-        return Paginated(total=total,
-                         offset=offset,
-                         limit=limit,
-                         results=res.entity)
+        return Paginated[Entity](total=total,
+                                 offset=offset,
+                                 limit=limit,
+                                 results=res.entity)
 
     except FeedEndpointNotFoundError as e:
         logger.error(f"Endpoint not found for feed '{feed}': {e}")
