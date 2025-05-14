@@ -5,6 +5,9 @@ from pydantic import BaseModel, Field
 
 
 class Feed(str, Enum):
+    """
+    Available feed endpoints from the MTA GTFS-RT API.
+    """
     ACE = "ACE"
     BDFM = "BDFM"
     G = "G"
@@ -16,6 +19,9 @@ class Feed(str, Enum):
 
 
 class EntityType(str, Enum):
+    """
+    Entity types that can be returned from the GTFS-RT feed response.
+    """
     ALERT = "alert"
     TRIP_UPDATE = "trip_update"
     VEHICLE = "vehicle"
@@ -82,14 +88,23 @@ class TripData(BaseModel):
 
 
 class InformedEntity(BaseModel):
+    """
+    Alerted entity with their trip_id and route_id.
+    """
     trip: TripData = Field("Alerted trips")
 
 
 class HeaderText(BaseModel):
+    """
+    Alert text description.
+    """
     text: str = Field("Description of the alert")
 
 
 class AlertHeaderData(BaseModel):
+    """
+    Alert entity's header text description in different languages.
+    """
     translation: List[HeaderText] = Field(
         description="List of translated header text")
 
