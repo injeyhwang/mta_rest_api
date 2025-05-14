@@ -7,7 +7,7 @@
 from sqlmodel import SQLModel, create_engine  # noqa: F401
 
 import app.db.models  # noqa: F401
-from app.config import settings as s
+from app.settings import settings as s
 from app.utils.logger import logger
 
 DATABASE_URL = f"postgresql://{s.db_user}:{s.db_password}@{s.db_host}:{

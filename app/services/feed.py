@@ -7,12 +7,12 @@ from fastapi import status
 from google.protobuf.json_format import MessageToDict
 from google.transit import gtfs_realtime_pb2
 
-from app.config import settings
 from app.exceptions.feed import (FeedEndpointNotFoundError, FeedFetchError,
                                  FeedProcessingError, FeedServiceError,
                                  FeedTimeoutError)
 from app.schemas.feed import (AlertEntity, Entity, EntityType, FeedResponse,
                               TripUpdateEntity, VehicleEntity)
+from app.settings import settings
 from app.utils.logger import logger
 
 

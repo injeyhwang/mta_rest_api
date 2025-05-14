@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, status
 
-from app.config import settings
 from app.schemas.root import RootResponse
+from app.settings import settings
 from app.utils.logger import logger
 
 router = APIRouter()
