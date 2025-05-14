@@ -14,13 +14,15 @@ The setup guide will be broken into the following steps:
 
 1. Set up Python and virtual environment
 2. Set up PostgreSQL database and `mta_admin` user
-3. [Optional] Download and unzip the latest `gtfs_subway`
+3. Download and unzip the latest `gtfs_subway`
 4. Initialize and seed the database
-5. Run `main.py`
+5. Configure SSL certificate for local development
+6. Run `main.py`
 
 ## Setting up Python and Virtual Environment
 ### Python 3
-I'm on Apple Silicon and have Python set up via homebrew. If you want your set up to be like mine, install Python via brew. Otherwise, feel free to skip this step.
+I'm on Apple Silicon and have Python set up via homebrew. If you want your set up to be like mine,
+install Python via brew. Otherwise, feel free to skip this step.
 ```sh
 brew install python@3.13
 ```
@@ -40,7 +42,8 @@ Python 3.13.3
 ```
 
 ### Virtual Environment
-If you haven't done so, please change current working directory to the project root directory. Then create a python virtual environment.
+If you haven't done so, please change current working directory to the project root directory. Then
+create a python virtual environment.
 
 ```sh
 ➜ python3 -m venv .venv
@@ -54,7 +57,8 @@ Install project dependencies with `pip`:
 
 ## Setting up PostgreSQL
 ### PostgreSQL
-I'm on macOS so I will be using homebrew to run postgres. If you're on Windows/Linux or have already set up/know how to configure PostgreSQL for your machine, skip this.
+I'm on macOS so I will be using homebrew to run postgres. If you're on Windows/Linux or have already
+set up/know how to configure PostgreSQL for your machine, skip this.
 
 First, install Postgres via homebrew if you haven't already.
 ```sh
@@ -99,10 +103,14 @@ GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public TO mta_admin;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO mta_admin;
 ```
 
-## [Optional] Download the latest regular GTFS static file
-If you'd like to use the latest regular GTFS Static data, you can go to [https://www.mta.info/developers](https://www.mta.info/developers) and download, unzip, and replace the `gtfs_subway` file into `app/db/` directory.
+## Download the latest regular GTFS static file
+If you'd like to use the latest regular GTFS Static data, you can go to
+[https://www.mta.info/developers](https://www.mta.info/developers) and download, unzip, and replace
+the `gtfs_subway` file into `app/db/` directory.
 
-> Regular GTFS: This file represents the "normal" subway schedule and does not include most temporary service changes, though some long term service changes may be included. It is typically updated a few times a year.
+> Regular GTFS: This file represents the "normal" subway schedule and does not include temporary
+> service changes, though some long term service changes may be included. It is typically updated
+> a few times a year.
 
 **Regular GTFS Static downloaded date: 04/24/2025**
 
@@ -128,14 +136,96 @@ run the seeding script to import over the latest GTFS static data.
 ➜ python3 -m app.db.scripts.seed_db
 ```
 
+## Configure SSL certificates for local development
+I'm on macOS so I will be using homebrew to run nginx. There is a nice tool
+[mkcert](https://mkcert.dev/) for generating certificate files and I will be using it as part of
+this guide. If you don't want to use `mkcert`, you can generate your own self-signed certs via
+`openssl`.
+
+### Generate SSL certificates
+We want to generate SSL cert files and locate them in easily identifiable place. I like to put them
+with the nginx files.
+```
+/opt/homebrew/etc/nginx/
+└── ssl/
+    ├── mta-api-local.com.pem
+    └── mta-api-local.com-key.pem
+```
+
+First, install nginx and mkcert
+```sh
+➜ brew install nginx mkcert
+```
+
+Then, create SSL directory `/ssl` in homebrew nginx config then `cd` into it.
+```sh
+➜ mkdir -p /opt/homebrew/etc/nginx/ssl
+➜ cd /opt/homebrew/etc/nginx/ssl
+```
+
+Use `mkcert` to create, trust CA, then generate certificate files. It should generate 2 files:
+`mta-api-local.com.pem` and `mta-api-local.com-key.pem`.
+```sh
+➜ mkcert -install
+The local CA is now installed in the system trust store! ⚡️
+
+➜ mkcert mta-api-local.com
+Created a new certificate valid for the following names 📜
+ - "mta-api-local.com"
+
+The certificate is at "./mta-api-local.com.pem" and the key at "./mta-api-local.com-key.pem" ✅
+
+It will expire on 13 August 2027 🗓
+```
+
+### Update Nginx configs
+The nginx server conf file is included as part of this project: `/configs/mta-api-local.conf` for
+your convenience. All you need to do is copy this file into `/opt/homebrew/etc/nginx/servers`
+```sh
+➜ cp /configs/mta-api-local.conf /opt/homebrew/etc/nginx/servers
+```
+
+Here's directory structure for reference.
+```
+/opt/homebrew/etc/nginx/
+└── servers/
+    └── mta-api-local.conf
+```
+If you installed nginx via brew, your `nginx.config` should have `include servers/*;` by default
+and so you won't need to modify the file. This is what allows the server files to be included as
+part of its configs.
+
+Note: if you decided to keep your SSL cert files in your directory of choice, make sure to change
+the path accordingly in `mta-api-local.conf`.
+```
+server {
+    ssl_certificate /your/ssl/file/path.pem;
+    ssl_certificate_key /your/ssl/file/path-key.pem;
+}
+```
+
+### Run nginx and verify configs
+To check that nginx is configured and running correctly, test nginx configuration
+```sh
+➜ nginx -t
+nginx: the configuration file /opt/homebrew/etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /opt/homebrew/etc/nginx/nginx.conf test is successful
+```
+If the test fails, double check your `mta-api-local.conf` and `nginx.conf` files.
+
+Restart nginx
+```sh
+➜ brew services restart nginx
+```
+
 ## Run FastAPI locally
 Finally, run the server.
 
 ```sh
 ➜ fastapi dev app/main.py
 ```
-*Note: the server runs on port: 8000 by default. Change the port number by passing the `--port` flag.*
+*Note: the server runs on port: 8000 by default.*
 
-On your browser, go to [http://localhost:8000/docs/](http://localhost:8000/docs/).
+On your browser, go to https://mta-api-local.com/docs
 
 You should see all the available endpoints! You can even try them out yourself on the doc page!
