@@ -233,7 +233,9 @@ class FeedService:
         """
         # No need to filter if no filters are given
         if (route_id is None
-                and stop_id is None and trip_id is None and filter_by is None):
+                and stop_id is None
+                and trip_id is None
+                and filter_by is None):
             return True
 
         if entity.entity_type == EntityType.ALERT:
