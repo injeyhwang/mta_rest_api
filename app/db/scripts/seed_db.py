@@ -12,8 +12,8 @@ from typing import Any, Dict, List
 from sqlmodel import Session, select
 
 from app.db.database import SQLModel, get_db_engine
-from app.db.models import (Calendar, CalendarDate, Route, Shape, Stop,
-                           StopTime, Transfer, Trip)
+from app.db.models.gtfs import (Calendar, CalendarDate, Route, Shape, Stop,
+                                StopTime, Transfer, Trip)
 from app.db.scripts.init_db import create_db_tables
 from app.settings import settings
 from app.utils.logger import logger

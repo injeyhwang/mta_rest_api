@@ -2,7 +2,7 @@ from typing import List, Tuple
 
 from sqlmodel import Session, func, select
 
-from app.db.models.trip import Trip
+from app.db.models.gtfs import Trip
 
 
 class TripRepository:

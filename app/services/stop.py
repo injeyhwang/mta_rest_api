@@ -2,7 +2,7 @@ from typing import List
 
 from sqlmodel import Session
 
-from app.db.models import Stop
+from app.db.models.gtfs import Stop
 from app.db.repositories.stop import StopRepository
 from app.db.repositories.stop_time import StopTimeRepository
 from app.exceptions.base import QueryInvalidError, ResourceNotFoundError

@@ -6,7 +6,7 @@
 
 from sqlmodel import SQLModel, create_engine  # noqa: F401
 
-import app.db.models  # noqa: F401
+import app.db.models.gtfs  # noqa: F401
 from app.settings import settings as s
 from app.utils.logger import logger
 

@@ -2,7 +2,7 @@ from typing import List
 
 from sqlmodel import Session
 
-from app.db.models import Route
+from app.db.models.gtfs import Route
 from app.db.repositories.route import RouteRepository
 from app.exceptions.base import ResourceNotFoundError
 from app.schemas.route import RouteResponse

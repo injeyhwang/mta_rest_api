@@ -2,7 +2,7 @@ from typing import List, Tuple
 
 from sqlmodel import Session, select
 
-from app.db.models import Stop, StopTime, Trip
+from app.db.models.gtfs import Stop, StopTime, Trip
 
 
 class StopTimeRepository:

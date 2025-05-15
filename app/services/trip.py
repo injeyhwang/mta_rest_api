@@ -1,6 +1,6 @@
 from sqlmodel import Session
 
-from app.db.models import Trip
+from app.db.models.gtfs import Trip
 from app.db.repositories.stop_time import StopTimeRepository
 from app.db.repositories.trip import TripRepository
 from app.exceptions.base import QueryInvalidError, ResourceNotFoundError
