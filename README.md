@@ -1,5 +1,5 @@
 # MTA REST API
-A simple REST API reverse proxy for MTA's complicated GTFS and GTFS-RT APIs. Built
+A simple REST API reverse proxy for MTA's GTFS Static and GTFS-RT APIs. Built
 with FastAPI, SQLModel, and `gtfs-realtime-bindings`.
 
 # Important dependencies
