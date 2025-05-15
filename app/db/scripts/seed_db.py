@@ -12,8 +12,8 @@ from typing import Any, Dict, List
 from sqlmodel import Session, select
 
 from app.db.database import SQLModel, get_db_engine
-from app.db.models import (Calendar, Route, Shape, Stop, StopTime, Transfer,
-                           Trip)
+from app.db.models import (Calendar, CalendarDate, Route, Shape, Stop,
+                           StopTime, Transfer, Trip)
 from app.db.scripts.init_db import create_db_tables
 from app.settings import settings
 from app.utils.logger import logger
@@ -165,6 +165,37 @@ def seed_calendar(session: Session):
         raise
 
 
+def seed_calendar_dates(session: Session):
+    try:
+        calendar_dates_file_path = os.path.join(
+            settings.gtfs_dir_path, "calendar_dates.txt")
+        if not os.path.exists(calendar_dates_file_path):
+            logger.info(("Calendar dates file not found at: "
+                         f"'{calendar_dates_file_path}'. Skipping."))
+            # GTFS standards have calendar_dates.txt as optional;
+            # gracefully skip
+            return
+
+        calendar_dates_data = read_csv_file(calendar_dates_file_path)
+        calendar_dates_data = convert_field_types(calendar_dates_data,
+                                                  CalendarDate)
+
+        for calendar_date_dict in calendar_dates_data:
+            calendar_date = CalendarDate(**calendar_date_dict)
+            session.add(calendar_date)
+
+        logger.info((f"Adding {len(calendar_dates_data)} entries to the "
+                     "calendar_dates table"))
+        session.commit()
+        logger.info(
+            ("Successfully committed calendar dates entries to ""database"))
+    except Exception as e:
+        logger.exception(f"Error seeding calendar dates: {e}")
+        session.rollback()
+        logger.info("Calendar dates changes rolled back")
+        raise
+
+
 def seed_shapes(session: Session):
     try:
         shapes_file_path = os.path.join(settings.gtfs_dir_path, "shapes.txt")
@@ -308,6 +339,7 @@ def seed_database():
             seed_routes(session)
             seed_stops(session)
             seed_calendar(session)
+            seed_calendar_dates(session)
             seed_shapes(session)
             seed_trips(session)
             seed_stop_times(session)

@@ -1,4 +1,5 @@
 from app.db.models.calendar import Calendar  # noqa: F401
+from app.db.models.calendar_date import CalendarDate  # noqa: F401
 from app.db.models.route import Route  # noqa: F401
 from app.db.models.shape import Shape  # noqa: F401
 from app.db.models.stop import Stop  # noqa: F401
